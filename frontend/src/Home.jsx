@@ -1,9 +1,49 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const Home = () => {
-  return (
-    <div>Home</div>
-  )
-}
+  const [authenticated, setAuthenticated] = useState(false);
+  const [userData, setUserData] = useState(null);
 
-export default Home
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post('https://msaid.dev/api/verifyjwt', {}, {
+          withCredentials: true});
+
+        // If code 200 that means verification successful
+        if (response.status === 200) {
+          const result = response.data;
+          console.log('verified');
+          setAuthenticated(true);
+          setUserData(result.decoded);
+        } else {
+          console.error('Failed to verify JWT token:', response.statusText);
+          setAuthenticated(false);
+          setUserData(null);
+        }
+      } catch (error) {
+        console.error('Error verifying JWT token:', error);
+        setAuthenticated(false);
+        setUserData(null);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  return (
+    <div>
+      {authenticated ? (
+        <div>
+          <p>Welcome, {userData.username}!</p>
+          <p>Your user ID is {userData.userId}.</p>
+        </div>
+      ) : (
+        <p>Please log in to access this page.</p>
+      )}
+    </div>
+  );
+};
+
+export default Home;

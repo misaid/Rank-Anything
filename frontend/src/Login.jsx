@@ -12,19 +12,12 @@ function Login() {
     event.preventDefault();
     try {
       const response = await axios.post('https://msaid.dev/api/login',{username, password});
-      const{ token } = response.data;
-      localStorage.setItem('token', token);
+      const{ cookie } = response.data;
+      localStorage.setItem('token', cookie);
       navigate('/home')
     } catch (error) {
       console.log("Login failed")
     }
-    
-    // .then(result => {
-    //   if (result.data = "Sucesss!") {
-    //     navigate('/home')
-    //   }
-    // })
-    // .catch(error=> console.log(error))
   };
   return (
     <div className="flex justify-center items-center h-screen bg-slate-400">
