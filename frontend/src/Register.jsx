@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Validation from './Validation'
 
+/**
+ * This is the register component that will allow the user to register
+ * @returns The registration component
+ */
 function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +19,7 @@ function Register() {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (password === password1) {
-      axios.post('https://msaid.dev/api/register', { username, password })
+      axios.post('http://localhost:5555/register', { username, password })
         .then(result => {
           console.log(result)
           navigate('/login')

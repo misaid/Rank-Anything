@@ -1,7 +1,15 @@
+/**
+ * This function does simple validation for the username and password
+ * @param {*} username  The username
+ * @param {*} password The password
+ * @param {*} password1 The verification password 
+ * @returns 
+ */
 export default function Validation(username, password, password1) {
     const errors = {};
-    //Minimum eight characters, at least one letter and one number
+    // Minimum eight characters, at least one letter and one number
     const password_pattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
     if (username === "") {
         errors.username = "Username is required.";
     }
@@ -17,7 +25,5 @@ export default function Validation(username, password, password1) {
     } else if (password1 !== password) {
         errors.password1 = "Passwords must match";
     }
-
     return errors;
-
 }

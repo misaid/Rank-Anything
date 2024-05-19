@@ -11,9 +11,11 @@ function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('https://msaid.dev/api/login',{username, password});
-      const{ cookie } = response.data;
-      localStorage.setItem('token', cookie);
+      await axios.post('http://localhost:5555/login',{username, password},
+      {
+        withCredentials: true
+      }
+      );
       navigate('/home')
     } catch (error) {
       console.log("Login failed")
