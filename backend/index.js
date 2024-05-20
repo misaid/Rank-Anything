@@ -1,155 +1,336 @@
-import dotenv from "dotenv"
-
-dotenv.config({ path: '../.env' });
-import express, { request, response } from "express";
+import dotenv from "dotenv";
+dotenv.config({ path: "../.env" });
+import express, { json, request, response } from "express";
+import cors from "cors";
+import bcrypt from "bcrypt";
+import jsonwebtoken, { decode } from "jsonwebtoken";
+import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
-import User from './models/user.js';
-import cors from 'cors';
-import bcrypt from 'bcrypt';
-import jsonwebtoken, { decode } from 'jsonwebtoken';
-import cookieParser from 'cookie-parser';
+
+// Models
+import User from "./models/user.js";
+// import List from "./models/rankedList.js";
+import SafeUser from "./models/safeUser.js";
+import Room from "./models/room.js";
+
+// Environment variables
 const PORT = process.env.PORT;
 const mongoDBURL = process.env.mongoDBURL;
 const secretKey = process.env.secretKey;
-
-
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 app.use(
-    cors({
-        origin: 'http://localhost:5173',
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        allowedHeaders: ['Content-Type'],
-        credentials: true,
-    })
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true,
+  })
 );
 
-app.get('/', (request, response) => {
-    console.log(request);
-    return response.status(234).send('MSAID')
+app.get("/", (request, response) => {
+  console.log(request);
+  return response.status(234).send("MSAID");
 });
-
 
 /**
  * Compares the jwt submitted with secretkey to see if it has been tamperred with
  */
-app.post('/verifyjwt', async (request, response) => {
-    const { jwt: token } = request.cookies;
-    console.log(request.cookies)
-    try {
-        // Token is valid
-        const decoded = jsonwebtoken.verify(token, secretKey);
-        console.log(decoded)
-        response.status(200).json({ valid: true, decoded });
-        console.log("jwt verified")
-    } catch (error) {
-        // Token is invalid
-        console.log("jwt invalid")
-        response.status(401).json({ valid: false });
-    }
+app.post("/verifyjwt", async (request, response) => {
+  const { jwt: token } = request.cookies;
+  try {
+    // Token is valid
+    const decoded = jsonwebtoken.verify(token, secretKey);
+    console.log(decoded.username, ": has been verified");
+    response.status(200).json({ valid: true, decoded });
+  } catch (error) {
+    // Token is invalid
+    console.log("jwt invalid");
+    response.status(401).json({ valid: false });
+  }
 });
 
 /**
  * User paswords are hashed with bcrypt so we have to compare the hashed password to the user input here.
  */
-app.post('/login', async (request, response) => {
-
-    try {
-        // Input verification
-        if (!request.body.username || !request.body.password) {
-            return response.status(400).send({
-                message: 'Please provide username and password',
-            });
-        }
-        const { username, password } = request.body;
-
-
-        // Checking to see if the user exists in the database
-        const user = await User.findOne({ username: username });
-        if (!user) {
-            return response.status(404).json({ message: "User not found" });
-        }
-
-        // Comparing password hash from database with user inputted hash
-        const passwordMatch = await bcrypt.compare(password, user.password);
-
-        if (passwordMatch) {
-            //Generating a json web token
-            // TODO: make http cookie from this webtoken.
-            const token = jsonwebtoken.sign({ userId: user._id, username: user.username, authLevel: 'user' }, secretKey, { expiresIn: '30d' });
-            console.log(token);
-
-            response.cookie('jwt', token, { 
-                httpOnly: true, 
-                secure: process.env.node_env === 'production',
-                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-                // sameSite: 'lax',
-                domain: "localhost",
-                // path: '/',
-            });
-        
-            console.log("Cookie created")
-            return response.status(200).json({ message: "Login successful" });
-
-        } else {
-            return response.status(401).json({ message: "Incorrect password" });
-        }
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
+app.post("/login", async (request, response) => {
+  try {
+    // Input verification
+    if (!request.body.username || !request.body.password) {
+      return response.status(400).send({
+        message: "Please provide username and password",
+      });
     }
-});
+    const { username, password } = request.body;
 
+    // Checking to see if the user exists in the database
+    const user = await User.findOne({ username: username });
+    if (!user) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    // Comparing password hash from database with user inputted hash
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (passwordMatch) {
+      //Generating a json web token
+      // TODO: make http cookie from this webtoken.
+      const token = jsonwebtoken.sign(
+        { userId: user._id, username: user.username, authLevel: "user" },
+        secretKey,
+        { expiresIn: "30d" }
+      );
+      console.log(token);
+
+      response.cookie("jwt", token, {
+        httpOnly: true,
+        secure: process.env.node_env === "production",
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        // sameSite: 'lax',
+        domain: "localhost",
+        // path: '/',
+      });
+
+      console.log("Cookie created");
+      return response.status(200).json({ message: "Login successful" });
+    } else {
+      return response.status(401).json({ message: "Incorrect password" });
+    }
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send({ message: error.message });
+  }
+});
 
 /**
  * User passwords are taken and if the user name is unique the password is hashed on stored.
  */
-app.post('/register', async (request, response) => {
-    try {
-        // Input verification
-        if (!request.body.username ||
-            !request.body.password
-        ) {
-            return response.status(400).send({
-                message: 'send all fields',
-            });
-        }
-
-        if (!(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(request.body.password))) {
-            return response.status(400).send({
-                message: 'Password not secure enough',
-            });
-        };
-        const { username, password } = request.body;
-        // Hashing the password on server for storage
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = {
-            username: username,
-            password: hashedPassword
-        };
-        const user = await User.create(newUser);
-        return response.status(201).send("User succesffuly created");
-
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
+app.post("/register", async (request, response) => {
+  try {
+    // Input verification
+    if (!request.body.username || !request.body.password) {
+      return response.status(400).send({
+        message: "send all fields",
+      });
     }
+
+    if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(request.body.password)) {
+      return response.status(400).send({
+        message: "Password not secure enough",
+      });
+    }
+    const { username, password } = request.body;
+    // Hashing the password on server for storage
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = {
+      username: username,
+      password: hashedPassword,
+    };
+    User.create(newUser)
+      .then((user) => {
+        console.log("User created");
+        response.status(200).send("User succesffuly created");
+        // Create a safe user object to store in the safe user collection
+        SafeUser.create({ _id: user._id, username: username })
+          .then(() => {
+            console.log("Safe user created");
+          })
+          .catch((error) => {
+            console.error("Error creating safe user:", error);
+            response.status(500).send("Internal Server Error");
+          });
+      })
+      .catch((error) => {
+        if (error.code === 11000 && error.keyPattern.username) {
+          // Duplicate username error
+          console.error("Username already exists:", error);
+          response.status(400).send("Username already exists");
+        } else {
+          console.error("Error creating user:", error);
+          response.status(500).send("Internal Server Error");
+        }
+      });
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send({ message: error.message });
+  }
 });
 
-
-mongoose
-    .connect(mongoDBURL)
-    .then(() => {
-        console.log('App connected to database');
-        app.listen(PORT, () => {
-            console.log(`App is listening to port: ${PORT}`);
+/**
+ * User logs out by clearing the cookie
+ */
+app.post("/logout", async (request, response) => {
+  response.clearCookie("jwt");
+  return response.status(200).send("Logged out");
+});
+/**
+ * Add room to user
+ */
+app.post("/user:id/room", async (request, response) => {
+  // get cookies and insure user = username
+  try {
+    const decoded = jsonwebtoken.verify(request.cookies.jwt, secretKey);
+    // console.log(decoded.userId, request.params.id);
+    if (decoded.userId !== request.params.id) {
+      return response.status(401).send("Unauthorized");
+    } else {
+      // console.log("User verified");
+      try {
+        const userId = request.params.id;
+        const roomId  = request.body.roomId;
+        // Find the user with the specified username
+        SafeUser.findOneAndUpdate
+        ({ _id: userId },
+        { $addToSet: { roomids: roomId } }, // Use $addToSet to ensure uniqueness
+        { new: true, upsert: false }
+        )
+        .then(() => {
+          response.status(200).send("Room added to user successfully");
+        })
+        .catch((error) => {
+          console.error("Error adding room to user:", error);
+          response.status(500).send("Internal Server Error");
         });
-    })
-    .catch((error) => {
-        console.log(error);
+        // response.status(200).send("Room added to user successfully");
+      } catch (error) {
+        console.error("Error adding room to user:", error);
+        response.status(500).send("Internal Server Error");
+      }
+    }
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send({ message: error.message });
+  }
+});
+/**
+ * Get Rooms from user
+ */
+app.get("/user:id/rooms", async (request, response) => {
+  // verify user id matches cookie
+  if (!request.cookies.jwt) {
+    return response.status(401).send("Unauthorized");
+  }
+  if( jsonwebtoken.verify(request.cookies.jwt, secretKey).userId !== request.params.id){
+    return response.status(401).send("Unauthorized");
+  }
+  try {
+    // Find the user with the specified username
+    SafeUser.findOne({ _id: request.params.id })
+      .then((user) => {
+        response.status(200).send(user.roomids);
+      })
+      .catch((error) => {
+        console.error("Error fetching rooms from user:", error);
+        response.status(500).send("Internal Server Error");
+      });
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send({ message: error.message });
+  }
+});
+/**
+ * add opinion to opinions object in room
+ * TODO: finish this
+ */
+app.post("/room:id/opinions", async (request, response) => {
+
+  try {
+    const decoded = jsonwebtoken.verify(request.cookies.jwt, secretKey);
+    const userId = decoded.userId;
+    const updatedRoom = await Room.findOneAndUpdate(
+      { roomname: request.params.id },
+      { $set: { [`opinions.${userId}.${request.body.opinion}`]: 1 } },
+      { new: true, upsert: false }
+    );
+  
+    if (!updatedRoom) {
+      response.status(404).send("Room not found");
+      return;
+    }
+  
+    response.status(200).send("Opinion added to room successfully");
+  } catch (error) {
+    console.error("Error adding opinion to room:", error);
+    response.status(401).send("Not authorized");
+  }
+});
+/**
+ * Create a room
+ */
+app.post("/room:id", async (request, response) => {
+  try {
+    // Create a new room with the received data
+    const drl = request.body.defaultRankedList;
+    const roomData = {
+      roomname: request.params.id,
+      defaultRankedList: drl,
+    };
+    Room.create(roomData)
+      .then(() => {
+        response.status(200).send("Room created successfully");
+      })
+      .catch((error) => {
+        console.error("Error creating room:", error);
+        response.status(500).send("Internal Server Error");
+      });
+  } catch (error) {
+    console.error(error.message);
+    response.status(500).send({ message: error.message });
+  }
+});
+/**
+ * Find a room by name
+ */
+app.get("/room:id", async (request, response) => {
+  try {
+    // Find the room with the specified name
+    Room.findOne({ roomname: request.params.id })
+      .then((room) => {
+        response.status(200).send(room);
+      })
+      .catch((error) => {
+        console.error("Error fetching room:", error);
+        response.status(500).send("Internal Server Error");
+      });
+  } catch (error) {
+    console.error(error.message);
+    response.status(500).send({ message: error.message });
+  }
+});
+
+/**
+ * Add a user to a room
+ */
+app.post("/room:id/user", async (request, response) => {
+  try {
+    const room = await Room.findOneAndUpdate(
+      { roomname: request.params.id },
+      { $addToSet: { users: request.body.username } }, // Use $addToSet to ensure uniqueness
+      { new: true, upsert: false }
+    );
+
+    response.status(200).send("User added to room successfully");
+  } catch (error) {
+    console.error("Error adding user to room:", error);
+    response.status(500).send("Internal Server Error");
+  }
+});
+
+/**
+ * Connect to the database and start the server
+ */
+mongoose
+  .connect(mongoDBURL)
+  .then(() => {
+    console.log("App connected to database");
+    app.listen(PORT, () => {
+      console.log(`App is listening to port: ${PORT}`);
     });
+  })
+  .catch((error) => {
+    console.log(error);
+  });

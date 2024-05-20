@@ -16,7 +16,7 @@ function Login() {
         withCredentials: true
       }
       );
-      navigate('/home')
+      navigate('/')
     } catch (error) {
       console.log("Login failed")
     }

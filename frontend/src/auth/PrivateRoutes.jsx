@@ -21,8 +21,6 @@ const PrivateRoutes = () => {
           withCredentials: true,
         });
         setAuth(response.data.valid);
-        console.log("this is the auth state", response.data.valid)
-        console.log(auth)
       } catch (error) {
         console.error('Cannot find JWT token', error);
         setAuth(false);
