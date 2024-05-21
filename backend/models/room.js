@@ -11,11 +11,16 @@ const roomSchema = new mongoose.Schema({
         unique: true,
     },
     // list of words with their corresponding scores
-    opinions: {
-        type: Map,
-        of: Number,
-        default: {},
-    },
+    opinions: [{
+        userId: {
+          type: String,
+          required: true,
+        },
+        opinions: {
+            type: Map,
+            of: Number,
+            default: {},
+        } }],
     avgOpinion: {
         type: Map,
         of: Number,

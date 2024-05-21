@@ -1,6 +1,7 @@
 import React from 'react';
 
 const AllUsers = ({ userList }) => { 
+    // toggle between user opinions
     return (
         <div>
             <h1>All Users: </h1>

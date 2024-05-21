@@ -233,31 +233,77 @@ app.get("/user:id/rooms", async (request, response) => {
   }
 });
 /**
- * add opinion to opinions object in room
- * TODO: finish this
+ * Add opinions to room. Handles even if there is prexisting opinions.
  */
-app.post("/room:id/opinions", async (request, response) => {
-
+app.post('/room:id/opinions', async (request, response) => {
   try {
-    const decoded = jsonwebtoken.verify(request.cookies.jwt, secretKey);
-    const userId = decoded.userId;
-    const updatedRoom = await Room.findOneAndUpdate(
-      { roomname: request.params.id },
-      { $set: { [`opinions.${userId}.${request.body.opinion}`]: 1 } },
-      { new: true, upsert: false }
-    );
-  
-    if (!updatedRoom) {
+    const roomId  = request.params.id;
+    const userOpinions = request.body;
+    console.log(typeof userOpinions, userOpinions)
+    const room = await Room.findOne({roomname: roomId});
+    if (room) {
+      for (const [userId, opinions] of Object.entries(userOpinions)) {
+
+        // Find the user's opinion entry in the room
+        let userOpinionEntry = room.opinions.find(entry => entry.userId === userId);
+        
+        // if userOpinionEntry is not found, create a new entry
+        if (!userOpinionEntry) {
+          userOpinionEntry = {
+            userId: userId,
+            opinions: new Map(room.defaultRankedList)
+          };
+          room.opinions.push(userOpinionEntry);
+        }
+
+        // Update the opinions
+        for (const [opinionKey, opinionValue] of Object.entries(opinions)) {
+          userOpinionEntry.opinions.set(opinionKey, opinionValue);
+        }
+      }
+      
+      // Init empty dict for avgOpinion
+      const opinionSums = new Map();
+      for (const key of room.defaultRankedList.keys()) {
+        opinionSums.set(key, 0);
+      }
+      
+      // Calculate avgOpinion
+      for (const entry of room.opinions) {
+        for (const [key, value] of entry.opinions.entries()) {
+          opinionSums.set(key, (opinionSums.get(key) || 0) + value);
+        }
+      }
+      room.avgOpinion = opinionSums;
+      await room.save();
+      response.status(200).json({ message: 'Opinions updated successfully' });
+    } else {
+      response.status(404).json({ error: 'Room not found' });
+    }
+  } catch (error) {
+    console.error("Error adding opinion to room:", error);
+    response.status(500).send("Internal Server Error");
+  }}
+);
+
+/**
+ * get opinions from room
+ */
+app.get("/room:id/opinions", async (request, response) => {
+  try {
+    const room = await Room.findOne({ roomname: request.params.id });
+    console.log(room);
+    if (!room) {
       response.status(404).send("Room not found");
       return;
     }
-  
-    response.status(200).send("Opinion added to room successfully");
+    response.status(200).send(room.opinions);
   } catch (error) {
-    console.error("Error adding opinion to room:", error);
-    response.status(401).send("Not authorized");
+    console.error("Error fetching opinions from room:", error);
+    response.status(500).send("Internal Server Error");
   }
 });
+
 /**
  * Create a room
  */
@@ -269,6 +315,7 @@ app.post("/room:id", async (request, response) => {
       roomname: request.params.id,
       defaultRankedList: drl,
     };
+    console.log(roomData);
     Room.create(roomData)
       .then(() => {
         response.status(200).send("Room created successfully");
@@ -282,6 +329,7 @@ app.post("/room:id", async (request, response) => {
     response.status(500).send({ message: error.message });
   }
 });
+
 /**
  * Find a room by name
  */

@@ -18,22 +18,25 @@ const Home = () => {
   const [users, setUsers] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [opinion, setOpinion] = useState(null);
-  // Initialize an opinion object for user useriD: {opinion: "opinion"}, which should be copied orignally from default list
-  const initOpinion = async (roomId, userData) => {
+  // send opinion to backend
+  const initOpinion = async (roomId, userId) => {
+     const test = {
+        "Apple": 100,
+        "Banana": 2,
+        "Kiwi": 3,
+        "Orange": 4,
+        "Pineapple": 5,
+        "Tomato": 6,
+        "Peaches": 7
+    }
+   const payload = {[userId]:test}
+
     try {
       // NEED user data
       console.log("initOpinion", roomId, );
       const response = await axios.post(
         `http://localhost:5555/room${roomId}/opinions`,
-        {userId: {
-          "Apple": 1,
-          "Banana": 2,
-          "Kiwi": 3,
-          "Orange": 4,
-          "Pineapple": 5,
-          "Tomato": 6,
-          "Peaches": 7
-      }},
+        payload,
         { withCredentials: true }
       );
       console.log(response.data);
@@ -141,7 +144,7 @@ const Home = () => {
           addRoomToUser(roomId, response.data.decoded.userId);
           addUserToRoom(roomId, response.data.decoded.username);
           getRoomsfromUser(response.data.decoded.userId);
-          initOpinion(roomId);
+          initOpinion(roomId, response.data.decoded.userId);
         }
       } catch (error) {
         console.error("cant find jwt token", error);
