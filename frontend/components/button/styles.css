@@ -1,0 +1,48 @@
+/*
+* Forked from https://codesandbox.io/p/sandbox/custom-react-switch-zj3in7?file=%2Fsrc%2FApp.tsx%3A15%2C5-15%2C29&from-embed=
+*/
+.App {
+    font-family: sans-serif;
+    text-align: center;
+  }
+  
+  .SwitchContainer {
+    display: flex;
+    background-color: white;
+    align-items: center;
+    border-radius: 35px;
+    width: max-content;
+    height: max-content;
+    border: 1px solid grey;
+  }
+  
+  .ToggleItem {
+    height: 40px;
+    width: 80px;
+    display: flex;
+    border-radius: 35px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .Text {
+    color: black;
+    font-size: 14px;
+  }
+  
+  body {
+    margin: 0;
+  }
+  
+  .background {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+  }
+  

@@ -14,6 +14,7 @@ const Home = () => {
   const defaultRoomId = "test";
   let { roomId= defaultRoomId } = useParams();
   const [rankedList, setRankedList] = useState([]);
+  const [opinionList, setOpinionList] = useState([]);
   const [authenticated, setAuthenticated] = useState(false);
   const [users, setUsers] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -25,7 +26,6 @@ const Home = () => {
    * @param {*} userId
    */
   const initOpinion = async (roomId, userId) => {
-    console.log(1);
     const test = {
       Apple: 100,
       Banana: 2,
@@ -56,7 +56,6 @@ const Home = () => {
    * @returns null
    */
   const getRoomsfromUser = async (userId) => {
-    console.log(2);
     if (!userId) {
       console.log("no user id");
       return;
@@ -78,7 +77,6 @@ const Home = () => {
    * @returns null
    */
   const addRoomToUser = async (roomId, userId) => {
-    console.log(3);
     if (!roomId | !userId) {
       console.log("no room id or no user id");
       return;
@@ -113,7 +111,6 @@ const Home = () => {
    * @returns
    */
   const addUserToRoom = async (roomId, username) => {
-    console.log(4);
     if (!username | !roomId) {
       return;
     }
@@ -124,7 +121,6 @@ const Home = () => {
           username: username,
         }
       );
-      await setUsers(users);
       setLoading(true);
       //console.log(response.data);
     } catch (error) {
@@ -135,7 +131,6 @@ const Home = () => {
    * Fetches room data
    */
   const fetchRoomData = async () => {
-    console.log(6);
 
     try {
       // Fetch room data including the ranked list
@@ -144,6 +139,7 @@ const Home = () => {
       //console.log(response.data.defaultRankedList);
 
       setRankedList(response.data.defaultRankedList);
+      setOpinionList(response.data.avgOpinion);
       setUsers(response.data.users);
     } catch (error) {
       console.error("Error fetching room data:", error);
@@ -153,7 +149,7 @@ const Home = () => {
    * fetches user data
    */
   const fetchData = async () => {
-    console.log(7);
+
     try {
       const response = await axios.post(
         "http://localhost:5555/verifyjwt",
@@ -167,16 +163,17 @@ const Home = () => {
       if (response.status === 200) {
         await setAuthenticated(response.data.valid);
         setUserData(response.data.decoded);
-        addRoomToUser(roomId, response.data.decoded.userId);
+        await addRoomToUser(roomId, response.data.decoded.userId);
         await addUserToRoom(roomId, response.data.decoded.username);
         await getRoomsfromUser(response.data.decoded.userId);
-        initOpinion(roomId, response.data.decoded.userId);
+        // initOpinion(roomId, response.data.decoded.userId);
       }
     } catch (error) {
       console.error("cant find jwt token", error);
       setAuthenticated(false);
       setUserData(null);
       setRankedList(null);
+      setOpinionList(null);
       setUsers(null);
     }
   };
@@ -194,13 +191,13 @@ const Home = () => {
           {authenticated ? (
             <div>
               <div className="bg-red-400">
-                <AllUsers userList={users} />
+                <AllUsers userList={users} roomId ={ roomId} opinionList = { opinionList} />
               </div>
               <div className="bg-orange-400">
                 <h1>Room id: {roomId}</h1>
               </div>
               <div className="bg-yellow-400">
-                <CurrentRankedList rankedList={rankedList} />
+                <CurrentRankedList rankedList={rankedList} rname = {roomId}  ol = { opinionList} />
               </div>
               <div className="bg-green-400">
                 <p>Welcome, {userData.username}!</p>
