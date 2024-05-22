@@ -12,7 +12,7 @@ import YourRooms from "../components/YourRooms";
 const Home = () => {
   const [userData, setUserData] = useState(null);
   const defaultRoomId = "test";
-  let { roomId } = useParams();
+  let { roomId= defaultRoomId } = useParams();
   const [rankedList, setRankedList] = useState([]);
   const [authenticated, setAuthenticated] = useState(false);
   const [users, setUsers] = useState([]);
