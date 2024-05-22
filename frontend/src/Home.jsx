@@ -12,28 +12,30 @@ import YourRooms from "../components/YourRooms";
 const Home = () => {
   const [userData, setUserData] = useState(null);
   const defaultRoomId = "test";
-  let { roomId = defaultRoomId } = useParams(); 
+  let { roomId } = useParams();
   const [rankedList, setRankedList] = useState([]);
   const [authenticated, setAuthenticated] = useState(false);
   const [users, setUsers] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [opinion, setOpinion] = useState(null);
+  const [loading, setLoading] = useState(false);
   // send opinion to backend
   const initOpinion = async (roomId, userId) => {
-     const test = {
-        "Apple": 100,
-        "Banana": 2,
-        "Kiwi": 3,
-        "Orange": 4,
-        "Pineapple": 5,
-        "Tomato": 6,
-        "Peaches": 7
-    }
-   const payload = {[userId]:test}
+    console.log(1);
+    const test = {
+      Apple: 100,
+      Banana: 2,
+      Kiwi: 3,
+      Orange: 4,
+      Pineapple: 5,
+      Tomato: 6,
+      Peaches: 7,
+    };
+    const payload = { [userId]: test };
 
     try {
       // NEED user data
-      console.log("initOpinion", roomId, );
+      console.log("initOpinion", roomId);
       const response = await axios.post(
         `http://localhost:5555/room${roomId}/opinions`,
         payload,
@@ -44,12 +46,13 @@ const Home = () => {
       console.error("Error pushing opinion to user:", error);
     }
   };
-/**
- * 
- * @param {*} userId The userId we get rooms from
- * @returns null
- */
+  /**
+   *
+   * @param {*} userId The userId we get rooms from
+   * @returns null
+   */
   const getRoomsfromUser = async (userId) => {
+    console.log(2);
     if (!userId) {
       console.log("no user id");
       return;
@@ -71,6 +74,7 @@ const Home = () => {
    * @returns null
    */
   const addRoomToUser = async (roomId, userId) => {
+    console.log(3);
     if (!roomId | !userId) {
       console.log("no room id or no user id");
       return;
@@ -97,6 +101,7 @@ const Home = () => {
     }
   };
   const addUserToRoom = async (roomId, username) => {
+    console.log(4);
     if (!username | !roomId) {
       return;
     }
@@ -113,77 +118,88 @@ const Home = () => {
       console.error("Error adding user to room:", error);
     }
   };
-  useEffect(() => {
-    const fetchRoomData = async () => {
-      try {
-        // Fetch room data including the ranked list
-        //console.log(`http://localhost:5555/room${roomId}`);
-        const response = await axios.get(`http://localhost:5555/room${roomId}`);
-        //console.log(response.data.defaultRankedList);
+  const fetchRoomData = async () => {
+    console.log(6);
 
-        setRankedList(response.data.defaultRankedList);
-        setUsers(response.data.users);
-      } catch (error) {
-        console.error("Error fetching room data:", error);
-      }
-    };
-    const fetchData = async () => {
-      try {
-        const response = await axios.post(
-          "http://localhost:5555/verifyjwt",
-          {},
-          {
-            withCredentials: true,
-          }
-        );
+    try {
+      // Fetch room data including the ranked list
+      //console.log(`http://localhost:5555/room${roomId}`);
+      const response = await axios.get(`http://localhost:5555/room${roomId}`);
+      //console.log(response.data.defaultRankedList);
 
-        // If code 200 that means verification successful
-        if (response.status === 200) {
-          setAuthenticated(response.data.valid);
-          setUserData(response.data.decoded);
-          addRoomToUser(roomId, response.data.decoded.userId);
-          addUserToRoom(roomId, response.data.decoded.username);
-          getRoomsfromUser(response.data.decoded.userId);
-          initOpinion(roomId, response.data.decoded.userId);
+      setRankedList(response.data.defaultRankedList);
+      setUsers(response.data.users);
+      setLoading(true);
+    } catch (error) {
+      console.error("Error fetching room data:", error);
+    }
+  };
+  const fetchData = async () => {
+    console.log(7);
+    try {
+      const response = await axios.post(
+        "http://localhost:5555/verifyjwt",
+        {},
+        {
+          withCredentials: true,
         }
-      } catch (error) {
-        console.error("cant find jwt token", error);
-        setAuthenticated(false);
-        setUserData(null);
-        setRankedList(null);
-        setUsers(null);
-      }
-    };
+      );
 
+      // If code 200 that means verification successful
+      if (response.status === 200) {
+        setAuthenticated(response.data.valid);
+        setUserData(response.data.decoded);
+        addRoomToUser(roomId, response.data.decoded.userId);
+        addUserToRoom(roomId, response.data.decoded.username);
+        getRoomsfromUser(response.data.decoded.userId);
+        initOpinion(roomId, response.data.decoded.userId);
+      }
+    } catch (error) {
+      console.error("cant find jwt token", error);
+      setAuthenticated(false);
+      setUserData(null);
+      setRankedList(null);
+      setUsers(null);
+    }
+  };
+  
+  useEffect(() => {
+    console.log("useEffect Started for", roomId);
     fetchRoomData();
     fetchData();
   }, [roomId]);
 
   return (
     <div>
-      {authenticated ? (
+      {loading ? (
         <div>
-          <div className="bg-red-400">
-            <AllUsers userList={users} />
-          </div>
-          <div className="bg-orange-400">
-            <h1>Room id: {roomId}</h1>
-          </div>
-          <div className="bg-yellow-400">
-            <CurrentRankedList rankedList={rankedList} />
-          </div>
-          <div className="bg-green-400">
-            <p>Welcome, {userData.username}!</p>
-          </div>
-          <div className="bg-blue-400">
-            <p>Your user ID is {userData.userId}.</p>
-          </div>
-          <div className="bg-indigo-400">
-            <YourRooms roomList={rooms} />
-          </div>
+          {authenticated ? (
+            <div>
+              <div className="bg-red-400">
+                <AllUsers userList={users} />
+              </div>
+              <div className="bg-orange-400">
+                <h1>Room id: {roomId}</h1>
+              </div>
+              <div className="bg-yellow-400">
+                <CurrentRankedList rankedList={rankedList} />
+              </div>
+              <div className="bg-green-400">
+                <p>Welcome, {userData.username}!</p>
+              </div>
+              <div className="bg-blue-400">
+                <p>Your user ID is {userData.userId}.</p>
+              </div>
+              <div className="bg-indigo-400">
+                <YourRooms roomList={rooms} />
+              </div>
+            </div>
+          ) : (
+            <p>Please log in to access this page.</p>
+          )}
         </div>
       ) : (
-        <p>Please log in to access this page.</p>
+        <p> Loading</p>
       )}
     </div>
   );
