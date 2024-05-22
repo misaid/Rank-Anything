@@ -239,7 +239,7 @@ app.post('/room:id/opinions', async (request, response) => {
   try {
     const roomId  = request.params.id;
     const userOpinions = request.body;
-    console.log(typeof userOpinions, userOpinions)
+    // console.log(typeof userOpinions, userOpinions)
     const room = await Room.findOne({roomname: roomId});
     if (room) {
       for (const [userId, opinions] of Object.entries(userOpinions)) {
@@ -292,7 +292,7 @@ app.post('/room:id/opinions', async (request, response) => {
 app.get("/room:id/opinions", async (request, response) => {
   try {
     const room = await Room.findOne({ roomname: request.params.id });
-    console.log(room);
+    // console.log(room);
     if (!room) {
       response.status(404).send("Room not found");
       return;
@@ -338,6 +338,7 @@ app.get("/room:id", async (request, response) => {
     // Find the room with the specified name
     Room.findOne({ roomname: request.params.id })
       .then((room) => {
+        console.log(room.users)
         response.status(200).send(room);
       })
       .catch((error) => {

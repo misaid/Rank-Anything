@@ -19,7 +19,11 @@ const Home = () => {
   const [rooms, setRooms] = useState([]);
   const [opinion, setOpinion] = useState(null);
   const [loading, setLoading] = useState(false);
-  // send opinion to backend
+  /**
+   * sends opinion to server
+   * @param {*} roomId
+   * @param {*} userId
+   */
   const initOpinion = async (roomId, userId) => {
     console.log(1);
     const test = {
@@ -47,7 +51,7 @@ const Home = () => {
     }
   };
   /**
-   *
+   * This function obtains all the users rooms
    * @param {*} userId The userId we get rooms from
    * @returns null
    */
@@ -68,7 +72,7 @@ const Home = () => {
     }
   };
   /**
-   * This function adds a room to a user
+   * This function adds a room to a user object
    * @param {*} roomId The room id to add to the user
    * @param {*} userId the user that room id will be added to
    * @returns null
@@ -95,11 +99,19 @@ const Home = () => {
         },
         { withCredentials: true }
       );
+      // console.log(roomCheckResponse.data)
+      await setUsers(roomCheckResponse.data.users);
       //console.log(response.data);
     } catch (error) {
       console.error("Error adding room to user:", error);
     }
   };
+  /**
+   * adds user to room
+   * @param {*} roomId
+   * @param {*} username
+   * @returns
+   */
   const addUserToRoom = async (roomId, username) => {
     console.log(4);
     if (!username | !roomId) {
@@ -112,12 +124,16 @@ const Home = () => {
           username: username,
         }
       );
-      setUsers(users);
+      await setUsers(users);
+      setLoading(true);
       //console.log(response.data);
     } catch (error) {
       console.error("Error adding user to room:", error);
     }
   };
+  /**
+   * Fetches room data
+   */
   const fetchRoomData = async () => {
     console.log(6);
 
@@ -129,11 +145,13 @@ const Home = () => {
 
       setRankedList(response.data.defaultRankedList);
       setUsers(response.data.users);
-      setLoading(true);
     } catch (error) {
       console.error("Error fetching room data:", error);
     }
   };
+  /**
+   * fetches user data
+   */
   const fetchData = async () => {
     console.log(7);
     try {
@@ -147,11 +165,11 @@ const Home = () => {
 
       // If code 200 that means verification successful
       if (response.status === 200) {
-        setAuthenticated(response.data.valid);
+        await setAuthenticated(response.data.valid);
         setUserData(response.data.decoded);
         addRoomToUser(roomId, response.data.decoded.userId);
-        addUserToRoom(roomId, response.data.decoded.username);
-        getRoomsfromUser(response.data.decoded.userId);
+        await addUserToRoom(roomId, response.data.decoded.username);
+        await getRoomsfromUser(response.data.decoded.userId);
         initOpinion(roomId, response.data.decoded.userId);
       }
     } catch (error) {
@@ -162,7 +180,7 @@ const Home = () => {
       setUsers(null);
     }
   };
-  
+
   useEffect(() => {
     console.log("useEffect Started for", roomId);
     fetchRoomData();
