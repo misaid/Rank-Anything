@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import Switch from "./button/Button";
-import "./button/styles.css"
+import "./button/styles.css";
 
 /**
  * This function is the current ranked list component
@@ -14,7 +14,7 @@ import "./button/styles.css"
  * the room name
  * @param {opinons} ol
  * the opinions of the users
- * @returns 
+ * @returns
  * The current ranked lists component
  */
 const CurrentRankedList = ({ rankedList, rname: roomname, ol: opinons }) => {
@@ -25,45 +25,45 @@ const CurrentRankedList = ({ rankedList, rname: roomname, ol: opinons }) => {
   // console.log("Opinions: ", opinons);
   const rankedListArray = Object.entries(rankedList);
   const opinions = Object.entries(opinons);
-  const [selectedOption, setSelectedOption] = useState("Option 1");
+  const [selectedOption, setSelectedOption] = useState("Me");
 
   const handleSwitchChange = (option) => {
     setSelectedOption(option);
-    console.log("Switched to", option)
+    console.log("Switched to", option);
   };
 
-
   return (
-    <div>
+    <div style={{ border: "1px solid black", borderRadius: "8px" }}>
       <Switch onSwitchChange={handleSwitchChange} />
       <h1>{selectedOption}</h1>
-      
-      { selectedOption === "Option 1" ? (
-      <div>
-        <h2>Current Ranked List:</h2>
-        <ul>
-          {rankedListArray.sort((a, b) => a[1] - b[1]) // Sort the array by value
-          .map(([key, value]) => (
-            <li key={value}>
-              <strong>{value}</strong>: {key}
-            </li>
-          ))}
-        </ul>
-      </div>
-    ) : (
-      <div>
-        <h2>Opinion List:</h2>
-        <ul>
-        {opinions.sort((a, b) => a[1] - b[1]) // Sort the array by value
-          .map(([key, value]) => (
-            <li key={value}>
-              <strong>{value}</strong>: {key}
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
-      
+
+      {selectedOption === "Me" ? (
+        <div>
+          <h2>Current Ranked List:</h2>
+          <ul>
+            {rankedListArray
+              .sort((a, b) => a[1] - b[1]) // Sort the array by value
+              .map(([key, value]) => (
+                <li key={value}>
+                  <strong>{value}</strong>: {key}
+                </li>
+              ))}
+          </ul>
+        </div>
+      ) : (
+        <div>
+          <h2>Opinion List:</h2>
+          <ul>
+            {opinions
+              .sort((a, b) => a[1] - b[1]) // Sort the array by value
+              .map(([key, value]) => (
+                <li key={value}>
+                  <strong>{value}</strong>: {key}
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

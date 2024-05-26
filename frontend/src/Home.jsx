@@ -4,6 +4,8 @@ import AllUsers from "../components/AllUsers";
 import CurrentRankedList from "../components/CurrentRankedList";
 import { useParams } from "react-router-dom";
 import YourRooms from "../components/YourRooms";
+import Room from "../../backend/models/room";
+import RoomCreateOrJoin from "../components/RoomCreateOrJoin";
 //TODO: finsih up intitializing opinion and changing opinion
 /**
  * Temporary Home component
@@ -12,7 +14,7 @@ import YourRooms from "../components/YourRooms";
 const Home = () => {
   const [userData, setUserData] = useState(null);
   const defaultRoomId = "test";
-  let { roomId= defaultRoomId } = useParams();
+  let { roomId = defaultRoomId } = useParams();
   const [rankedList, setRankedList] = useState([]);
   const [opinionList, setOpinionList] = useState([]);
   const [authenticated, setAuthenticated] = useState(false);
@@ -131,7 +133,6 @@ const Home = () => {
    * Fetches room data
    */
   const fetchRoomData = async () => {
-
     try {
       // Fetch room data including the ranked list
       //console.log(`http://localhost:5555/room${roomId}`);
@@ -149,7 +150,6 @@ const Home = () => {
    * fetches user data
    */
   const fetchData = async () => {
-
     try {
       const response = await axios.post(
         "http://localhost:5555/verifyjwt",
@@ -190,23 +190,42 @@ const Home = () => {
         <div>
           {authenticated ? (
             <div>
-              <div className="bg-red-400">
-                <AllUsers userList={users} roomId ={ roomId} opinionList = { opinionList} />
-              </div>
-              <div className="bg-orange-400">
-                <h1>Room id: {roomId}</h1>
-              </div>
-              <div className="bg-yellow-400">
-                <CurrentRankedList rankedList={rankedList} rname = {roomId}  ol = { opinionList} />
-              </div>
               <div className="bg-green-400">
                 <p>Welcome, {userData.username}!</p>
               </div>
               <div className="bg-blue-400">
                 <p>Your user ID is {userData.userId}.</p>
               </div>
-              <div className="bg-indigo-400">
-                <YourRooms roomList={rooms} />
+              <div className="flex flex-wrap">
+                <div className="flex-1">
+                  <div className="bg-purple-400">
+                    <RoomCreateOrJoin />
+                  </div>
+                  <div className="bg-indigo-400">
+                    <YourRooms roomList={rooms} />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="bg-orange-400">
+                    <h1>Room id: {roomId}</h1>
+                  </div>
+                  <div className="bg-yellow-400 ">
+                    <CurrentRankedList
+                      rankedList={rankedList}
+                      rname={roomId}
+                      ol={opinionList}
+                    />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="bg-red-400 ">
+                    <AllUsers
+                      userList={users}
+                      roomId={roomId}
+                      opinionList={opinionList}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           ) : (

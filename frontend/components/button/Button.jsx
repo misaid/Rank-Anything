@@ -5,8 +5,8 @@
 import React, { useState } from "react";
 import "./styles.css";
 
-const OPTION1 = "Option 1";
-const OPTION2 = "Option 2";
+const OPTION1 = "Me";
+const OPTION2 = "All";
 
 const Switch = ({ onSwitchChange }) => {
   const [last, setLast] = useState(null);

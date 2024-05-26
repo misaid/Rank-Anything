@@ -20,7 +20,8 @@ const roomSchema = new mongoose.Schema({
             type: Map,
             of: Number,
             default: {},
-        } }],
+        } }
+        ],
     avgOpinion: {
         type: Map,
         of: Number,

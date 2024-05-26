@@ -9,7 +9,7 @@ import { useEffect } from "react";
  */
 const AllUsers = ({ userList }) => {
   return (
-    <div >
+    <div style={{ border: '1px solid black', borderRadius: '8px' }}>
       <h1>All Users: </h1>
       <ul>
         {userList.map((username, index) => (

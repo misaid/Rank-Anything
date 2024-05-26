@@ -45,7 +45,7 @@ app.post("/verifyjwt", async (request, response) => {
   try {
     // Token is valid
     const decoded = jsonwebtoken.verify(token, secretKey);
-    console.log(decoded.username, ": has been verified");
+    //console.log(decoded.username, ": has been verified");
     response.status(200).json({ valid: true, decoded });
   } catch (error) {
     // Token is invalid
@@ -181,20 +181,20 @@ app.post("/user:id/room", async (request, response) => {
       // console.log("User verified");
       try {
         const userId = request.params.id;
-        const roomId  = request.body.roomId;
+        const roomId = request.body.roomId;
         // Find the user with the specified username
-        SafeUser.findOneAndUpdate
-        ({ _id: userId },
-        { $addToSet: { roomids: roomId } }, // Use $addToSet to ensure uniqueness
-        { new: true, upsert: false }
+        SafeUser.findOneAndUpdate(
+          { _id: userId },
+          { $addToSet: { roomids: roomId } }, // Use $addToSet to ensure uniqueness
+          { new: true, upsert: false }
         )
-        .then(() => {
-          response.status(200).send("Room added to user successfully");
-        })
-        .catch((error) => {
-          console.error("Error adding room to user:", error);
-          response.status(500).send("Internal Server Error");
-        });
+          .then(() => {
+            response.status(200).send("Room added to user successfully");
+          })
+          .catch((error) => {
+            console.error("Error adding room to user:", error);
+            response.status(500).send("Internal Server Error");
+          });
         // response.status(200).send("Room added to user successfully");
       } catch (error) {
         console.error("Error adding room to user:", error);
@@ -214,7 +214,10 @@ app.get("/user:id/rooms", async (request, response) => {
   if (!request.cookies.jwt) {
     return response.status(401).send("Unauthorized");
   }
-  if( jsonwebtoken.verify(request.cookies.jwt, secretKey).userId !== request.params.id){
+  if (
+    jsonwebtoken.verify(request.cookies.jwt, secretKey).userId !==
+    request.params.id
+  ) {
     return response.status(401).send("Unauthorized");
   }
   try {
@@ -235,23 +238,24 @@ app.get("/user:id/rooms", async (request, response) => {
 /**
  * Add opinions to room. Handles even if there is prexisting opinions.
  */
-app.post('/room:id/opinions', async (request, response) => {
+app.post("/room:id/opinions", async (request, response) => {
   try {
-    const roomId  = request.params.id;
+    const roomId = request.params.id;
     const userOpinions = request.body;
     // console.log(typeof userOpinions, userOpinions)
-    const room = await Room.findOne({roomname: roomId});
+    const room = await Room.findOne({ roomname: roomId });
     if (room) {
       for (const [userId, opinions] of Object.entries(userOpinions)) {
-
         // Find the user's opinion entry in the room
-        let userOpinionEntry = room.opinions.find(entry => entry.userId === userId);
-        
+        let userOpinionEntry = room.opinions.find(
+          (entry) => entry.userId === userId
+        );
+
         // if userOpinionEntry is not found, create a new entry
         if (!userOpinionEntry) {
           userOpinionEntry = {
             userId: userId,
-            opinions: new Map(room.defaultRankedList)
+            opinions: new Map(room.defaultRankedList),
           };
           room.opinions.push(userOpinionEntry);
         }
@@ -261,13 +265,13 @@ app.post('/room:id/opinions', async (request, response) => {
           userOpinionEntry.opinions.set(opinionKey, opinionValue);
         }
       }
-      
+
       // Init empty dict for avgOpinion
       const opinionSums = new Map();
       for (const key of room.defaultRankedList.keys()) {
         opinionSums.set(key, 0);
       }
-      
+
       // Calculate avgOpinion
       for (const entry of room.opinions) {
         for (const [key, value] of entry.opinions.entries()) {
@@ -276,15 +280,15 @@ app.post('/room:id/opinions', async (request, response) => {
       }
       room.avgOpinion = opinionSums;
       await room.save();
-      response.status(200).json({ message: 'Opinions updated successfully' });
+      response.status(200).json({ message: "Opinions updated successfully" });
     } else {
-      response.status(404).json({ error: 'Room not found' });
+      response.status(404).json({ error: "Room not found" });
     }
   } catch (error) {
     console.error("Error adding opinion to room:", error);
     response.status(500).send("Internal Server Error");
-  }}
-);
+  }
+});
 
 /**
  * get opinions from room
@@ -309,11 +313,9 @@ app.get("/room:id/opinions", async (request, response) => {
  */
 app.post("/room:id", async (request, response) => {
   try {
-    // Create a new room with the received data
-    const drl = request.body.defaultRankedList;
     const roomData = {
       roomname: request.params.id,
-      defaultRankedList: drl,
+      //defaultRankedList: drl,
     };
     console.log(roomData);
     Room.create(roomData)
@@ -336,10 +338,15 @@ app.post("/room:id", async (request, response) => {
 app.get("/room:id", async (request, response) => {
   try {
     // Find the room with the specified name
+    // console.log(request.params.id)
     Room.findOne({ roomname: request.params.id })
       .then((room) => {
-        console.log(room.users)
-        response.status(200).send(room);
+        console.log(request.params.id, room);
+        if (room === null) {
+          response.status(500).send(room);
+        } else {
+          response.status(200).send(room);
+        }
       })
       .catch((error) => {
         console.error("Error fetching room:", error);
