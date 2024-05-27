@@ -1,16 +1,35 @@
 import React from "react";
+import "../src/index.css";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const YourRooms = ({ roomList }) => {
+  const navigate = useNavigate();
+  const handleClick = (event) => {
+    console.log(event.target.innerText)
+    navigate(`/list/${event.target.innerText}`);
+  }
   return (
-    <div style={{ border: '1px solid black', borderRadius: '8px' }}>
-      <h1>Your rooms: </h1>
-      <ul>
-        {roomList.map((key, value) => (
-          <li key={value}>{key}</li>
-        ))}
-      </ul>
-    </div>
+    // add a border
+      <table className="
+      border-2 border-black border-solid rounded
+      ">
+        <thead className="border-2 border-black border-solid rounded">
+          <tr>
+            <th>Your Rooms</th>
+            </tr>
+          </thead>
+        <tbody>
+          {roomList.map((room, index) => (
+            <tr onClick={handleClick} key={index} className={"hover:bg-slate-400"}>
+              <td>{room}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table> 
   );
+  
 };
 
 export default YourRooms;

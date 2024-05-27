@@ -317,7 +317,7 @@ app.post("/room:id", async (request, response) => {
       roomname: request.params.id,
       //defaultRankedList: drl,
     };
-    console.log(roomData);
+    // console.log(roomData);
     Room.create(roomData)
       .then(() => {
         response.status(200).send("Room created successfully");
@@ -341,7 +341,7 @@ app.get("/room:id", async (request, response) => {
     // console.log(request.params.id)
     Room.findOne({ roomname: request.params.id })
       .then((room) => {
-        console.log(request.params.id, room);
+        // console.log(request.params.id, room);
         if (room === null) {
           response.status(500).send(room);
         } else {

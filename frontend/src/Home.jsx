@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import YourRooms from "../components/YourRooms";
 import Room from "../../backend/models/room";
 import RoomCreateOrJoin from "../components/RoomCreateOrJoin";
+import "./index.css";
 //TODO: finsih up intitializing opinion and changing opinion
 /**
  * Temporary Home component
@@ -196,16 +197,16 @@ const Home = () => {
               <div className="bg-blue-400">
                 <p>Your user ID is {userData.userId}.</p>
               </div>
-              <div className="flex flex-wrap">
-                <div className="flex-1">
-                  <div className="bg-purple-400">
+              <div className="flex flex-wrap justify-center items-center">
+                <div className="flex-1 space-y-40  ml-3 mt-5 mr-5 ">
+                  <div className="h-30 w-30">
                     <RoomCreateOrJoin />
                   </div>
-                  <div className="bg-indigo-400">
+                  <div className="">
                     <YourRooms roomList={rooms} />
                   </div>
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 mx-5 space-y-1">
                   <div className="bg-orange-400">
                     <h1>Room id: {roomId}</h1>
                   </div>
@@ -217,8 +218,8 @@ const Home = () => {
                     />
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="bg-red-400 ">
+                <div className="flex-1 ml-5 mt-10 mr-3 ">
+                  <div className="">
                     <AllUsers
                       userList={users}
                       roomId={roomId}

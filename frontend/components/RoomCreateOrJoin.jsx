@@ -2,7 +2,6 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { set } from "mongoose";
 
 const RoomCreateOrJoin = () => {
   const [roomId, setRoomId] = useState();
