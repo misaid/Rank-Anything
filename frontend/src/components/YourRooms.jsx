@@ -1,5 +1,5 @@
 import React from "react";
-import "../src/index.css";
+import "../index.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -13,7 +13,7 @@ const YourRooms = ({ roomList }) => {
   return (
     // add a border
       <table className="
-      border-2 border-black border-solid rounded
+      border-2 border-black border-solid rounded 
       ">
         <thead className="border-2 border-black border-solid rounded">
           <tr>
@@ -22,7 +22,7 @@ const YourRooms = ({ roomList }) => {
           </thead>
         <tbody>
           {roomList.map((room, index) => (
-            <tr onClick={handleClick} key={index} className={"hover:bg-slate-400"}>
+            <tr onClick={handleClick} key={index} className={"hover:bg-slate-200"}>
               <td>{room}</td>
             </tr>
           ))}

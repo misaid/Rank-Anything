@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import AllUsers from "../components/AllUsers";
-import CurrentRankedList from "../components/CurrentRankedList";
+import AllUsers from "./components/AllUsers";
+import CurrentRankedList from "./components/CurrentRankedList";
 import { useParams } from "react-router-dom";
-import YourRooms from "../components/YourRooms";
+import YourRooms from "./components/YourRooms";
 import Room from "../../backend/models/room";
-import RoomCreateOrJoin from "../components/RoomCreateOrJoin";
+import RoomCreateOrJoin from "./components/RoomCreateOrJoin";
 import "./index.css";
 //TODO: finsih up intitializing opinion and changing opinion
 /**
