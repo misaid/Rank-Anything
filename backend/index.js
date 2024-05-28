@@ -317,6 +317,10 @@ app.post("/room:id", async (request, response) => {
       roomname: request.params.id,
       //defaultRankedList: drl,
     };
+    if (roomData.roomname.length < 3 || roomData.roomname.length > 20) {
+      response.status(400).send("Room name must be between 3 and 20 characters");
+      return;
+    };
     // console.log(roomData);
     Room.create(roomData)
       .then(() => {

@@ -12,18 +12,16 @@ const YourRooms = ({ roomList }) => {
   }
   return (
     // add a border
-      <table className="
-      border-2 border-black border-solid rounded 
-      ">
-        <thead className="border-2 border-black border-solid rounded">
+      <table style={{ boxShadow: '0 0 0 1px black',  borderRadius: '5px' }}>
+        <thead className="">
           <tr>
             <th>Your Rooms</th>
             </tr>
           </thead>
-        <tbody>
+        <tbody className="border-t-2 border-black border-solid ">
           {roomList.map((room, index) => (
-            <tr onClick={handleClick} key={index} className={"hover:bg-slate-200"}>
-              <td>{room}</td>
+            <tr onClick={handleClick} key={index} className="hover:bg-slate-200  cursor-pointer">
+              <td className="text-xl px-4">{room}</td>
             </tr>
           ))}
         </tbody>

@@ -4,12 +4,20 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const RoomCreateOrJoin = () => {
-  const [roomId, setRoomId] = useState();
-  const [croomId, setCRoomId] = useState();
+  const [roomId, setRoomId] = useState("");
+  const [croomId, setCRoomId] = useState("");
   const navigate = useNavigate();
   const handleCreateRoom = async (event) => {
     event.preventDefault();
     if (!croomId) {
+      return;
+    }
+    if (croomId.length < 3) {
+      console.log("Room ID must be at least 3 characters");
+      return;
+    }
+    if (croomId.length > 20) {
+      console.log("Room ID must be at most 20 characters");
       return;
     }
     try {
@@ -50,9 +58,9 @@ const RoomCreateOrJoin = () => {
     }
   };
   return (
-    <div style={{ border: "1px solid black", borderRadius: "8px" }}>
-      <h2 className="mb-2 text-2xl">Join Room</h2>
-      <form className="flex flex-col gap-4" onSubmit={handleJoinRoom}>
+    <div className="w-full border border-black rounded-xl">
+      <h2 className="m-2 text-base">Join Room</h2>
+      <form className="m-2 flex flex-col " onSubmit={handleJoinRoom}>
         <div className="flex items-center mb-1 ">
           {/* <label htmlFor="email" className="mr-2">
             <strong>Room ID</strong>
@@ -62,20 +70,20 @@ const RoomCreateOrJoin = () => {
             placeholder="Enter Room ID"
             autoComplete="off"
             name="email"
-            className="w-full px-3 py-2 border border-gray-300 rounded mr-2"
+            className="w-4/6 px-3 py-2 border text-sm border-gray-300 rounded mr-2"
             value={roomId}
             onChange={(e) => setRoomId(e.target.value)}
           />
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-2 rounded"
           >
             Join Room
           </button>
         </div>
       </form>
-      <h2 className="mb-2 text-2xl">Create Room</h2>
-      <form className="flex flex-col gap-4" onSubmit={handleCreateRoom}>
+      <h2 className="m-2 text-base">Create Room</h2>
+      <form className="flex flex-col m-2 gap-4" onSubmit={handleCreateRoom}>
         <div className="flex items-center mb-1 ">
           {/* <label htmlFor="email" className="mr-2">
             <strong>Room ID</strong>
@@ -85,13 +93,13 @@ const RoomCreateOrJoin = () => {
             placeholder="Enter Room ID"
             autoComplete="off"
             name="email"
-            className="w-full px-3 py-2 mr-2 border border-gray-300 rounded"
+            className="w-4/6 px-3 py-2 mr-2 border text-sm border-gray-300 rounded"
             value={croomId}
             onChange={(e) => setCRoomId(e.target.value)}
           />
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-2 rounded"
           >
             Create Room
           </button>

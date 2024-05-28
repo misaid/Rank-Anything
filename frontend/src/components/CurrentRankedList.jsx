@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import Switch from "./button/Button";
 import "./button/styles.css";
+import "../index.css";
 
 /**
  * This function is the current ranked list component
@@ -33,32 +34,35 @@ const CurrentRankedList = ({ rankedList, rname: roomname, ol: opinons }) => {
   };
 
   return (
-    <div style={{ border: "1px solid black", borderRadius: "8px" }}>
-      <Switch onSwitchChange={handleSwitchChange} />
-      <h1>{selectedOption}</h1>
+    <div>
+      <div className="flex justify-center">
+        <Switch onSwitchChange={handleSwitchChange} />
+      </div>
+      {/* <h1>{selectedOption}</h1> */}
 
-      {selectedOption === "Me" ? (
-        <div>
-          <h2>Current Ranked List:</h2>
-          <ul>
+      {selectedOption === "Me" && (
+        <div className="flex justify-center ">
+          <ul className="border border-black border-solid rounded">
             {rankedListArray
               .sort((a, b) => a[1] - b[1]) // Sort the array by value
               .map(([key, value]) => (
+                
                 <li key={value}>
                   <strong>{value}</strong>: {key}
                 </li>
               ))}
           </ul>
         </div>
-      ) : (
-        <div>
-          <h2>Opinion List:</h2>
-          <ul>
+      )}
+
+      {selectedOption !== "Me" && (
+        <div className="flex justify-center">
+          <ul className="border border-black border-solid rounded">
             {opinions
               .sort((a, b) => a[1] - b[1]) // Sort the array by value
-              .map(([key, value]) => (
-                <li key={value}>
-                  <strong>{value}</strong>: {key}
+              .map(([key, index]) => (
+                <li key={index} className="text-3xl p-4">
+                  <strong>{index}</strong>: {key}
                 </li>
               ))}
           </ul>

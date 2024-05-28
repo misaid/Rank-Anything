@@ -197,20 +197,20 @@ const Home = () => {
               <div className="bg-blue-400">
                 <p>Your user ID is {userData.userId}.</p>
               </div>
-              <div className="flex flex-wrap justify-center items-center">
-                <div className="flex-1 space-y-40  ml-3 mt-5 mr-5 ">
-                  <div className="h-30 w-30">
+              <div className="flex flex-wrap w-full ">
+                <div className=" flex-1 mx-10 mt-60">
+                  <div className=" ">
                     <RoomCreateOrJoin />
                   </div>
-                  <div className="">
+                  <div className="mt-32">
                     <YourRooms roomList={rooms} />
                   </div>
                 </div>
-                <div className="flex-1 mx-5 space-y-1">
-                  <div className="bg-orange-400">
+                <div className="flex-grow ">
+                  <div className="bg-red-400">
                     <h1>Room id: {roomId}</h1>
                   </div>
-                  <div className="bg-yellow-400 ">
+                  <div className=" ">
                     <CurrentRankedList
                       rankedList={rankedList}
                       rname={roomId}
@@ -218,14 +218,14 @@ const Home = () => {
                     />
                   </div>
                 </div>
-                <div className="flex-1 ml-5 mt-10 mr-3 ">
-                  <div className="">
+                <div className="flex-1 m-5 mt-60 ">
+                  <div className="w-20 mx-auto">
                     <AllUsers
                       userList={users}
                       roomId={roomId}
                       opinionList={opinionList}
                     />
-                  </div>
+                    </div>
                 </div>
               </div>
             </div>

@@ -9,17 +9,21 @@ import { useEffect } from "react";
  */
 const AllUsers = ({ userList }) => {
   return (
-    <div style={{ border: '2px solid black', borderRadius: '8px' }}>
-      <div style={{ borderBottom: '1px solid black '}}>
-      <h1>All Users: </h1>
-      </div>
-      <ul>
+    <table   style={{ boxShadow: '0 0 0 1px black',  borderRadius: '5px' }}>
+      <thead className="">
+        <tr>
+          <th>Users</th>
+          </tr>
+        </thead>
+      <tbody className="border-t-2 border-solid border-black ">
         {userList.map((username, index) => (
-          <li key={index}>{username}</li>
+          <tr className="">
+            <td className="px-4 text-xl">{username}</td>
+          </tr>
         ))}
-      </ul>
-    </div>
-  );
+      </tbody>
+    </table> 
+);
 };
 
 export default AllUsers;
