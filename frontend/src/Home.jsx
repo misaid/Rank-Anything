@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AllUsers from "./components/AllUsers";
 import CurrentRankedList from "./components/CurrentRankedList";
-import { useParams } from "react-router-dom";
+import { redirect, useNavigate, useParams } from "react-router-dom";
 import YourRooms from "./components/YourRooms";
 import Room from "../../backend/models/room";
 import RoomCreateOrJoin from "./components/RoomCreateOrJoin";
@@ -23,11 +23,28 @@ const Home = () => {
   const [rooms, setRooms] = useState([]);
   const [opinion, setOpinion] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   /**
    * sends opinion to server
    * @param {*} roomId
    * @param {*} userId
    */
+  const logout = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5555/logout",
+        {},
+        { withCredentials: true }
+      );
+
+      
+      setAuthenticated(false);
+      setUserData(null);
+      navigate("/login")
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
   const initOpinion = async (roomId, userId) => {
     const test = {
       Apple: 100,
@@ -124,8 +141,6 @@ const Home = () => {
           username: username,
         }
       );
-      rooms.push(roomId);
-      setLoading(true);
       //console.log(response.data);
     } catch (error) {
       console.error("Error adding user to room:", error);
@@ -136,11 +151,8 @@ const Home = () => {
    */
   const fetchRoomData = async () => {
     try {
-      // Fetch room data including the ranked list
-      //console.log(`http://localhost:5555/room${roomId}`);
-      const response = await axios.get(`http://localhost:5555/room${roomId}`);
-      //console.log(response.data.defaultRankedList);
-
+      // Fetch room data including the ranked list, opinions, and users
+      const response = await axios.get(`http://localhost:5555/room${roomId}`, {withCredentials: true});
       setRankedList(response.data.defaultRankedList);
       setOpinionList(response.data.avgOpinion);
       setUsers(response.data.users);
@@ -163,11 +175,12 @@ const Home = () => {
 
       // If code 200 that means verification successful
       if (response.status === 200) {
-        await setAuthenticated(response.data.valid);
-        await setUserData(response.data.decoded);
+        setAuthenticated(response.data.valid);
+        setUserData(response.data.decoded);
         await addRoomToUser(roomId, response.data.decoded.userId);
         await addUserToRoom(roomId, response.data.decoded.username);
         await getRoomsfromUser(response.data.decoded.userId);
+        setLoading(true);
         // initOpinion(roomId, response.data.decoded.userId);
       }
     } catch (error) {
@@ -192,12 +205,20 @@ const Home = () => {
         <div>
           {authenticated ? (
             <div>
-              <div className="">
-                <p>Welcome, {userData.username}!</p>
+              <div className="flex text-xl  bg-slate-300 border-b border-solid border-black">
+                <div className="border p-5 border-black border-solid">
+                <p>Welcome, {userData.username}</p>
+                </div>
+                <div className="p-5 justify-center flex flex-1 border border-black border-solid space-x-10">
+                <h1>Rank Anything </h1><img src="assets/ranking.png" alt="Rank Anything" />
+                </div>
+                <div className="p-5  flex border border-black border-solid cursor-pointer" onClick={logout} >
+                <p>Logout, </p> <img src="assets\logout.png" alt="Logout" />
+                </div>
               </div>
-              <div className="">
+              {/* <div className="">
                 <p>Your user ID is {userData.userId}.</p>
-              </div>
+              </div> */}
               <div className="flex flex-wrap w-full ">
                 <div className=" flex-1 mx-10 mt-60">
                   <div className="w-80">
@@ -234,6 +255,7 @@ const Home = () => {
             </div>
           ) : (
             <p>Please log in to access this page.</p>
+
           )}
         </div>
       ) : (

@@ -37,7 +37,11 @@ const roomSchema = new mongoose.Schema({
         type: Map,
         of: Number, default: {},
         required: false,
-    }
+    },
+    creator: {
+        type: String,
+        required: true,
+    },
     });
 const Room = mongoose.model('Rooms', roomSchema);
 export default Room;

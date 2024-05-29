@@ -211,15 +211,23 @@ app.post("/user:id/room", async (request, response) => {
  */
 app.get("/user:id/rooms", async (request, response) => {
   // verify user id matches cookie
-  if (!request.cookies.jwt) {
-    return response.status(401).send("Unauthorized");
+  try {
+    if (!request.cookies.jwt) {
+      return response.status(401).send("Unauthorized");
+    }
+    // console.log(request.cookies.jwt);
+    if (
+      jsonwebtoken.verify(request.cookies.jwt, secretKey).userId !==
+      request.params.id
+    ) {
+      return response.status(401).send("Unauthorized");
+    }
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send({ message: error.message });
   }
-  if (
-    jsonwebtoken.verify(request.cookies.jwt, secretKey).userId !==
-    request.params.id
-  ) {
-    return response.status(401).send("Unauthorized");
-  }
+
+  // get rooms from user
   try {
     // Find the user with the specified username
     SafeUser.findOne({ _id: request.params.id })
@@ -313,14 +321,27 @@ app.get("/room:id/opinions", async (request, response) => {
  */
 app.post("/room:id", async (request, response) => {
   try {
+    console.log(request.cookies.jwt);
+    if (!request.cookies.jwt) {
+      return response.status(401).send("Unauthorized");
+    }
+    
+    const decoded = jsonwebtoken.verify(request.cookies.jwt, secretKey);
+    if (!decoded) {
+      return response.status(401).send("Unauthorized");
+    }
+
     const roomData = {
       roomname: request.params.id,
+      creator: decoded.userId,
       //defaultRankedList: drl,
     };
     if (roomData.roomname.length < 3 || roomData.roomname.length > 20) {
-      response.status(400).send("Room name must be between 3 and 20 characters");
+      response
+        .status(400)
+        .send("Room name must be between 3 and 20 characters");
       return;
-    };
+    }
     // console.log(roomData);
     Room.create(roomData)
       .then(() => {
@@ -330,6 +351,7 @@ app.post("/room:id", async (request, response) => {
         console.error("Error creating room:", error);
         response.status(500).send("Internal Server Error");
       });
+    console.log("Room created", roomData.creator, roomData.roomname);
   } catch (error) {
     console.error(error.message);
     response.status(500).send({ message: error.message });
@@ -341,15 +363,28 @@ app.post("/room:id", async (request, response) => {
  */
 app.get("/room:id", async (request, response) => {
   try {
+    const decoded = jsonwebtoken.verify(request.cookies.jwt, secretKey);
     // Find the room with the specified name
     // console.log(request.params.id)
     Room.findOne({ roomname: request.params.id })
       .then((room) => {
         // console.log(request.params.id, room);
         if (room === null) {
-          response.status(500).send(room);
+          response.status(500).send("Room not found");
         } else {
-          response.status(200).send(room);
+          if (room.users.includes(decoded.username)) {
+            response.status(200).send(room);
+          } else {
+            room.users.push(decoded.username);
+            room.save()
+            .then(() => {
+              response.status(200).send(room);
+            })
+            .catch((error) => {
+              console.error("Error adding user to room:", error);
+              response.status(500).send("Internal Server Error");
+            });
+          }
         }
       })
       .catch((error) => {

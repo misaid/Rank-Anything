@@ -17,8 +17,8 @@ const AllUsers = ({ userList }) => {
         </thead>
       <tbody className="border-t-2 border-solid border-black ">
         {userList.map((username, index) => (
-          <tr className="">
-            <td className="px-4 text-xl">{username}</td>
+          <tr key={index}className="">
+            <td  className="px-4 text-xl">{username}</td>
           </tr>
         ))}
       </tbody>

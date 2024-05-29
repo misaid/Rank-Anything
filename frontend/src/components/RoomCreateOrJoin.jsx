@@ -22,10 +22,10 @@ const RoomCreateOrJoin = () => {
     }
     try {
       const response = await axios.post(
-        `http://localhost:5555/room${croomId}`,
+        `http://localhost:5555/room${croomId}`,{},
         {
           withCredentials: true,
-        }
+        },
       );
       navigate(`/list/${croomId}`);
       setRoomId("");
