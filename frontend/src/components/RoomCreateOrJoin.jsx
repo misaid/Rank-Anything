@@ -70,7 +70,7 @@ const RoomCreateOrJoin = () => {
             placeholder="Enter Room ID"
             autoComplete="off"
             name="email"
-            className="w-4/6 px-3 py-2 border text-sm border-gray-300 rounded mr-2"
+            className="w-4/6 px-3 py-2 border-b text-sm border-gray-400  mr-2"
             value={roomId}
             onChange={(e) => setRoomId(e.target.value)}
           />
@@ -93,7 +93,7 @@ const RoomCreateOrJoin = () => {
             placeholder="Enter Room ID"
             autoComplete="off"
             name="email"
-            className="w-4/6 px-3 py-2 mr-2 border text-sm border-gray-300 rounded"
+            className="w-4/6 px-3 py-2 mr-2 border-b text-sm border-gray-400 "
             value={croomId}
             onChange={(e) => setCRoomId(e.target.value)}
           />

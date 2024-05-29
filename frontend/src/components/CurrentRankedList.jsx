@@ -35,7 +35,7 @@ const CurrentRankedList = ({ rankedList, rname: roomname, ol: opinons }) => {
 
   return (
     <div>
-      <div className="flex justify-center">
+      <div className="flex justify-center mt-6 mb-4">
         <Switch onSwitchChange={handleSwitchChange} />
       </div>
       {/* <h1>{selectedOption}</h1> */}

@@ -21,6 +21,9 @@ function Login() {
       console.log("Login failed")
     }
   };
+  const handleRegister = async (event) => {
+    navigate('/register')
+  }
   return (
     <div className="flex justify-center items-center h-screen bg-slate-400">
       <div className="bg-white p-3 rounded w-25">
@@ -52,7 +55,7 @@ function Login() {
           <button type='submit' className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
             Login
           </button>
-          <button className='bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded'>
+          <button className='bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded' onClick={handleRegister}>
             Register
           </button>
         </form>

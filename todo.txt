@@ -2,4 +2,5 @@
     1.1) We have to add ranking to current ranked list component
     1.2) We have to be able to append to the default empty list and remove from it. Cap it within view?
 2) We have to add room creation and room joining.✅
-3) We have to add possiblity to view other peoples list if the user want's too. (on user's hover small window)
+3) Adding the possiblity to view other peoples list if the user wants too. (on user's hover small window)
+4) Whitelist

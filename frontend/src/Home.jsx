@@ -124,6 +124,7 @@ const Home = () => {
           username: username,
         }
       );
+      rooms.push(roomId);
       setLoading(true);
       //console.log(response.data);
     } catch (error) {
@@ -163,7 +164,7 @@ const Home = () => {
       // If code 200 that means verification successful
       if (response.status === 200) {
         await setAuthenticated(response.data.valid);
-        setUserData(response.data.decoded);
+        await setUserData(response.data.decoded);
         await addRoomToUser(roomId, response.data.decoded.userId);
         await addUserToRoom(roomId, response.data.decoded.username);
         await getRoomsfromUser(response.data.decoded.userId);
@@ -191,15 +192,15 @@ const Home = () => {
         <div>
           {authenticated ? (
             <div>
-              <div className="bg-green-400">
+              <div className="">
                 <p>Welcome, {userData.username}!</p>
               </div>
-              <div className="bg-blue-400">
+              <div className="">
                 <p>Your user ID is {userData.userId}.</p>
               </div>
               <div className="flex flex-wrap w-full ">
                 <div className=" flex-1 mx-10 mt-60">
-                  <div className=" ">
+                  <div className="w-80">
                     <RoomCreateOrJoin />
                   </div>
                   <div className="mt-32">
@@ -207,8 +208,10 @@ const Home = () => {
                   </div>
                 </div>
                 <div className="flex-grow ">
-                  <div className="bg-red-400">
-                    <h1>Room id: {roomId}</h1>
+                  <div className="flex justify-center mt-6">
+                    
+                  {/* rounded bg-black hover:bg-white hover:rounded-none */}
+                    <h1 className="text-5xl ">Ranking: <span className="border-b-2 border-solid border-black "> {roomId}</span></h1>
                   </div>
                   <div className=" ">
                     <CurrentRankedList
@@ -219,7 +222,7 @@ const Home = () => {
                   </div>
                 </div>
                 <div className="flex-1 m-5 mt-60 ">
-                  <div className="w-20 mx-auto">
+                  <div className="w-80 mx-auto">
                     <AllUsers
                       userList={users}
                       roomId={roomId}
