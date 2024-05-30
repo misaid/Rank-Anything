@@ -4,3 +4,11 @@
 2) We have to add room creation and room joining.✅
 3) Adding the possiblity to view other peoples list if the user wants too. (on user's hover small window)
 4) Whitelist
+
+* bugs
+1) on first login rooms and user is empty
+
+* opimization
+1) rooms are called by name would be faster with id
+2) redundant calls.
+3) opinions is a list of dicts if possible should be a dicts of dicts.

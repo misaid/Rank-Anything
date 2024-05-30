@@ -12,20 +12,20 @@ const YourRooms = ({ roomList }) => {
   }
   return (
     // add a border
-      <table style={{ boxShadow: '0 0 0 1px black',  borderRadius: '5px' }}>
-        <thead className="">
-          <tr>
-            <th>Your Rooms</th>
-            </tr>
-          </thead>
-        <tbody className="border-t-2 border-black border-solid ">
+      <div className="border border-solid border-black rounded max-w-64">
+        <div className="flex justify-center border-b border-solid border-black">
+          <h2 className="font-bold">
+            Your Rooms
+            </h2>
+          </div>
+        <div className="border-t-2 border-black border-solid max-h-64 overflow-y-scroll">
           {roomList.map((room, index) => (
-            <tr onClick={handleClick} key={index} className="hover:bg-slate-200  cursor-pointer">
-              <td className="text-xl px-4">{room}</td>
-            </tr>
+            <li onClick={handleClick} key={index} className="hover:bg-slate-200  cursor-pointer list-none">
+              <ol className="text-xl px-4 max-q-64 break-words overflow-hidden">{room}</ol>
+            </li>
           ))}
-        </tbody>
-      </table> 
+        </div>
+      </div> 
   );
   
 };

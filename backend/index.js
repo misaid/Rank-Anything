@@ -243,6 +243,7 @@ app.get("/user:id/rooms", async (request, response) => {
     response.status(500).send({ message: error.message });
   }
 });
+
 /**
  * Add opinions to room. Handles even if there is prexisting opinions.
  */
@@ -325,7 +326,7 @@ app.post("/room:id", async (request, response) => {
     if (!request.cookies.jwt) {
       return response.status(401).send("Unauthorized");
     }
-    
+
     const decoded = jsonwebtoken.verify(request.cookies.jwt, secretKey);
     if (!decoded) {
       return response.status(401).send("Unauthorized");
@@ -369,21 +370,38 @@ app.get("/room:id", async (request, response) => {
     Room.findOne({ roomname: request.params.id })
       .then((room) => {
         // console.log(request.params.id, room);
+        // if user is not in opinions, add them and set them to default ranked list
+        const userOpinion = room.opinions.find(
+          (opinion) => opinion.userId === decoded.userId
+        );
+        if (!userOpinion) {
+          // If the user's opinion doesn't exist, add it with the default ranked list
+          console.log("User opinion not found")
+          room.opinions.push({
+            userId: decoded.userId,
+            opinions: room.defaultRankedList,
+          });
+        }
+        console.log(userOpinion)
+
         if (room === null) {
           response.status(500).send("Room not found");
         } else {
           if (room.users.includes(decoded.username)) {
-            response.status(200).send(room);
+            response.status(200).send({ room: room, userId: decoded.userId });
           } else {
             room.users.push(decoded.username);
-            room.save()
-            .then(() => {
-              response.status(200).send(room);
-            })
-            .catch((error) => {
-              console.error("Error adding user to room:", error);
-              response.status(500).send("Internal Server Error");
-            });
+            room
+              .save()
+              .then(() => {
+                response
+                  .status(200)
+                  .send({ room: room, userId: decoded.userId });
+              })
+              .catch((error) => {
+                console.error("Error adding user to room:", error);
+                response.status(500).send("Internal Server Error");
+              });
           }
         }
       })
@@ -414,7 +432,62 @@ app.post("/room:id/user", async (request, response) => {
     response.status(500).send("Internal Server Error");
   }
 });
+/**
+ * add item to room
+ */
+app.put("/room:id/item", async (request, response) => {
+  try {
+    if (request.cookies.jwt === null) {
+      return response.status(401).send("Unauthorized");
+    }
 
+    const decoded = jsonwebtoken.verify(request.cookies.jwt, secretKey);
+
+    if (!decoded) {
+      return response.status(401).send("Unauthorized");
+    }
+
+    Room.findOne({ roomname: request.params.id }).then((room) => {
+      if (!room || decoded.userId !== room.creator) {
+        response.status(404).send("not authorized or room dne");
+        return;
+      }
+
+      const item = request.body.item;
+      //score is the amount of items in the list
+      const score = room.defaultRankedList.size;
+      // reset the default ranked list to orderd list 1-n
+      const newRankedList = new Map();
+      let i = 0;
+      for (const key of room.defaultRankedList.keys()) {
+        newRankedList.set(key, i);
+        i++;
+      }
+      newRankedList.set(item, score);
+
+      // when a new item is added to the list, the opinions and avgOpinion must be reset
+      room.defaultRankedList = newRankedList;
+      // set opinions all to defaultRankedList
+      for (const entry of room.opinions) {
+        entry.opinions = new Map(room.defaultRankedList);
+      }
+      room.avgOpinion = new Map();
+
+      room
+        .save()
+        .then(() => {
+          response.status(200).send("Item added to room successfully");
+        })
+        .catch((error) => {
+          console.error("Error adding item to room:", error);
+          response.status(500).send("Internal Server Error");
+        });
+    });
+  } catch (error) {
+    console.error("Error adding item to room:", error);
+    response.status(500).send("Internal Server Error");
+  }
+});
 /**
  * Connect to the database and start the server
  */

@@ -23,6 +23,7 @@ const Home = () => {
   const [rooms, setRooms] = useState([]);
   const [opinion, setOpinion] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [myOpinion, setMyOpinion] = useState(null);
   const navigate = useNavigate();
   /**
    * sends opinion to server
@@ -37,10 +38,9 @@ const Home = () => {
         { withCredentials: true }
       );
 
-      
       setAuthenticated(false);
       setUserData(null);
-      navigate("/login")
+      navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -106,7 +106,7 @@ const Home = () => {
         `http://localhost:5555/room${roomId}`,
         { withCredentials: true }
       );
-      if (!roomCheckResponse.data) {
+      if (!roomCheckResponse.data.room) {
         console.error("Room does not exist");
         return;
       }
@@ -118,7 +118,8 @@ const Home = () => {
         { withCredentials: true }
       );
       // console.log(roomCheckResponse.data)
-      await setUsers(roomCheckResponse.data.users);
+      await setUsers(roomCheckResponse.data.room.users);
+
       //console.log(response.data);
     } catch (error) {
       console.error("Error adding room to user:", error);
@@ -152,10 +153,22 @@ const Home = () => {
   const fetchRoomData = async () => {
     try {
       // Fetch room data including the ranked list, opinions, and users
-      const response = await axios.get(`http://localhost:5555/room${roomId}`, {withCredentials: true});
-      setRankedList(response.data.defaultRankedList);
-      setOpinionList(response.data.avgOpinion);
-      setUsers(response.data.users);
+      const response = await axios.get(`http://localhost:5555/room${roomId}`, {
+        withCredentials: true,
+      });
+      setRankedList(response.data.room.defaultRankedList);
+      setOpinionList(response.data.room.avgOpinion);
+      setUsers(response.data.room.users);
+      const id = response.data.userId;
+
+      // could be more efficient, should always have a opinion as the call creates a default opinion
+      for (let i = 0; i < response.data.room.opinions.length; i++) {
+        if (response.data.room.opinions[i].userId === id) {
+          setMyOpinion(response.data.room.opinions[i].opinions);
+          console.log("found");
+          break;
+        }
+      }
     } catch (error) {
       console.error("Error fetching room data:", error);
     }
@@ -207,13 +220,17 @@ const Home = () => {
             <div>
               <div className="flex text-xl  bg-slate-300 border-b border-solid border-black">
                 <div className="border p-5 border-black border-solid">
-                <p>Welcome, {userData.username}</p>
+                  <p>Welcome, {userData.username}</p>
                 </div>
                 <div className="p-5 justify-center flex flex-1 border border-black border-solid space-x-10">
-                <h1>Rank Anything </h1><img src="assets/ranking.png" alt="Rank Anything" />
+                  <h1>Rank Anything </h1>
+                  <img src="assets/ranking.png" alt="Rank Anything" />
                 </div>
-                <div className="p-5  flex border border-black border-solid cursor-pointer" onClick={logout} >
-                <p>Logout, </p> <img src="assets\logout.png" alt="Logout" />
+                <div
+                  className="p-5  flex border border-black border-solid cursor-pointer"
+                  onClick={logout}
+                >
+                  <p>Logout, </p> <img src="assets\logout.png" alt="Logout" />
                 </div>
               </div>
               {/* <div className="">
@@ -230,15 +247,21 @@ const Home = () => {
                 </div>
                 <div className="flex-grow ">
                   <div className="flex justify-center mt-6">
-                    
-                  {/* rounded bg-black hover:bg-white hover:rounded-none */}
-                    <h1 className="text-5xl ">Ranking: <span className="border-b-2 border-solid border-black "> {roomId}</span></h1>
+                    {/* rounded bg-black hover:bg-white hover:rounded-none */}
+                    <h1 className="text-5xl ">
+                      Ranking:{" "}
+                      <span className="border-b-2 border-solid border-black ">
+                        {" "}
+                        {roomId}
+                      </span>
+                    </h1>
                   </div>
                   <div className=" ">
                     <CurrentRankedList
                       rankedList={rankedList}
                       rname={roomId}
                       ol={opinionList}
+                      myOpinion={myOpinion}
                     />
                   </div>
                 </div>
@@ -249,13 +272,12 @@ const Home = () => {
                       roomId={roomId}
                       opinionList={opinionList}
                     />
-                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           ) : (
             <p>Please log in to access this page.</p>
-
           )}
         </div>
       ) : (

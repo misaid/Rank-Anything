@@ -3,6 +3,7 @@ import { useState } from "react";
 import Switch from "./button/Button";
 import "./button/styles.css";
 import "../index.css";
+import { all } from "axios";
 
 /**
  * This function is the current ranked list component
@@ -18,14 +19,19 @@ import "../index.css";
  * @returns
  * The current ranked lists component
  */
-const CurrentRankedList = ({ rankedList, rname: roomname, ol: opinons }) => {
-  // Convert object to array of key-value pairs
+const CurrentRankedList = ({ rankedList, rname: roomname, ol: avgOpinion, myOpinion}) => {
+  // rname = roomID
+  // rankedList = DefaultRankedList
+  // opinons = avgopinions
 
   // console.log("userList: ", rankedList);
   // console.log("Room Id: ", roomname);
   // console.log("Opinions: ", opinons);
-  const rankedListArray = Object.entries(rankedList);
-  const opinions = Object.entries(opinons);
+  // userOpinion = opinonion.userid
+  // console.log(typeof myOpinion)
+  // console.log(Object.entries(myOpinion))
+  const rankedListArray = Object.entries(myOpinion);
+  const opinions = Object.entries(avgOpinion);
   const [selectedOption, setSelectedOption] = useState("Me");
 
   const handleAddition = (event) => {
