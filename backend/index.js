@@ -447,18 +447,14 @@ app.put("/room:id/item", async (request, response) => {
     if (!decoded) {
       return response.status(401).send("Unauthorized");
     }
-
+    console.log("username: ", !decoded.username === "admin");
     Room.findOne({ roomname: request.params.id }).then((room) => {
-      if (
-        !room ||
-        decoded.userId !== room.creator ||
-        !decoded.username === "admin"
-      ) {
-        response.status(401).send("not authorized");
-        return;
+      if (!room || decoded.userId !== room.creator) {
+        if (decoded.username !== "admin") {
+          response.status(401).send("Not Authorized");
+          return;
+        }
       }
-      console.log("room found + authorized");
-
       const item = request.body.item;
       if (item === "") {
         response.status(400).send("Item cannot be empty");
@@ -488,7 +484,6 @@ app.put("/room:id/item", async (request, response) => {
       room
         .save()
         .then(() => {
-          console.log("room saved added: ", item);
           response.status(200).send("Item added to room successfully");
         })
         .catch((error) => {
@@ -518,13 +513,11 @@ app.delete("/room:id/item", async (request, response) => {
     }
 
     Room.findOne({ roomname: request.params.id }).then((room) => {
-      if (
-        !room ||
-        decoded.userId !== room.creator ||
-        !decoded.username === "admin"
-      ) {
-        response.status(401).send("not authorized");
-        return;
+      if (!room || decoded.userId !== room.creator) {
+        if (decoded.username !== "admin") {
+          response.status(401).send("Not Authorized");
+          return;
+        }
       }
       console.log("room found + authorized");
 

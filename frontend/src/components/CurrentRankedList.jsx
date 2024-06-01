@@ -124,7 +124,7 @@ const CurrentRankedList = ({
 
       {selectedOption === "Me" && (
         <div className="flex justify-center mb-6 ">
-          <ul className="border border-black border-solid rounded">
+          <ul className="max-h-[600px] h-[600px] border border-black border-solid rounded">
             {myRankedList
               .sort((a, b) => a[1] - b[1]) // Sort the array by value
               .map(([key, value]) => (

@@ -4,6 +4,7 @@
 2) We have to add room creation and room joining.✅
 3) Adding the possiblity to view other peoples list if the user wants too. (on user's hover small window).
 4) Whitelist.
+5) text for when room dne/exists. text for item dne/exists.
 
 * bugs
 1) on first login rooms and user is empty. (may be fixed if we move post to components).
