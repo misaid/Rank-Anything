@@ -322,7 +322,7 @@ app.get("/room:id/opinions", async (request, response) => {
  */
 app.post("/room:id", async (request, response) => {
   try {
-    console.log(request.cookies.jwt);
+    // console.log(request.cookies.jwt);
     if (!request.cookies.jwt) {
       return response.status(401).send("Unauthorized");
     }
@@ -382,7 +382,7 @@ app.get("/room:id", async (request, response) => {
             opinions: room.defaultRankedList,
           });
         }
-        console.log(userOpinion)
+        // console.log(userOpinion)
 
         if (room === null) {
           response.status(500).send("Room not found");
@@ -432,6 +432,7 @@ app.post("/room:id/user", async (request, response) => {
     response.status(500).send("Internal Server Error");
   }
 });
+
 /**
  * add item to room
  */
@@ -448,22 +449,21 @@ app.put("/room:id/item", async (request, response) => {
     }
 
     Room.findOne({ roomname: request.params.id }).then((room) => {
-      if (!room || decoded.userId !== room.creator) {
-        response.status(404).send("not authorized or room dne");
+      if (!room || decoded.userId !== room.creator|| !decoded.username === "admin") {
+        response.status(401).send("not authorized");
         return;
       }
+      console.log("room found + authorized")
 
       const item = request.body.item;
-      //score is the amount of items in the list
-      const score = room.defaultRankedList.size;
       // reset the default ranked list to orderd list 1-n
       const newRankedList = new Map();
-      let i = 0;
+      let i = 1;
       for (const key of room.defaultRankedList.keys()) {
         newRankedList.set(key, i);
         i++;
       }
-      newRankedList.set(item, score);
+      newRankedList.set(item, i);
 
       // when a new item is added to the list, the opinions and avgOpinion must be reset
       room.defaultRankedList = newRankedList;
@@ -471,11 +471,12 @@ app.put("/room:id/item", async (request, response) => {
       for (const entry of room.opinions) {
         entry.opinions = new Map(room.defaultRankedList);
       }
-      room.avgOpinion = new Map();
+      room.avgOpinion = new Map(room.defaultRankedList);
 
       room
         .save()
         .then(() => {
+          console.log("room saved added: ", item)
           response.status(200).send("Item added to room successfully");
         })
         .catch((error) => {
@@ -485,6 +486,74 @@ app.put("/room:id/item", async (request, response) => {
     });
   } catch (error) {
     console.error("Error adding item to room:", error);
+    response.status(500).send("Internal Server Error");
+  }
+});
+
+/**
+ * delete item from room
+ */
+app.delete("/room:id/item", async (request, response) => {
+  try {
+    if (request.cookies.jwt === null) {
+      return response.status(401).send("Unauthorized");
+    }
+
+    const decoded = jsonwebtoken.verify(request.cookies.jwt, secretKey);
+
+    if (!decoded) {
+      return response.status(401).send("Unauthorized");
+    }
+
+    Room.findOne({ roomname: request.params.id }).then((room) => {
+      if (!room || decoded.userId !== room.creator|| !decoded.username === "admin") {
+        response.status(401).send("not authorized");
+        return;
+      }
+      console.log("room found + authorized")
+
+      let item = request.body.item;
+      if (item === "") {
+        // get the last item from the dictionary
+        item = Array.from(room.defaultRankedList.keys()).pop();
+      }
+
+      // if the item is not in the list, return an error
+      if (!room.defaultRankedList.has(item)) {
+        response.status(400).send("Item not found in room");
+        return;
+      }
+      console.log("item to delete: ", item)
+      // reset the default ranked list to orderd list 1-n
+      const newRankedList = new Map();
+      let i = 1;
+      for (const key of room.defaultRankedList.keys()) {
+        if (key !== item) {
+          newRankedList.set(key, i);
+          i++;
+        }
+      }
+
+      // when an item is removed from the list, the opinions and avgOpinion must be reset
+      room.defaultRankedList = newRankedList;
+      // set opinions all to defaultRankedList
+      for (const entry of room.opinions) {
+        entry.opinions = new Map(room.defaultRankedList);
+      }
+      room.avgOpinion = new Map(room.defaultRankedList);
+
+      room
+        .save()
+        .then(() => {
+          response.status(200).send("Item deleted from room successfully");
+        })
+        .catch((error) => {
+          console.error("Error deleting item from room:", error);
+          response.status(500).send("Internal Server Error");
+        });
+    });
+  } catch (error) {
+    console.error("Error deleting item from room:", error);
     response.status(500).send("Internal Server Error");
   }
 });

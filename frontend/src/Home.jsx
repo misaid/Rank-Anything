@@ -4,32 +4,30 @@ import AllUsers from "./components/AllUsers";
 import CurrentRankedList from "./components/CurrentRankedList";
 import { redirect, useNavigate, useParams } from "react-router-dom";
 import YourRooms from "./components/YourRooms";
-import Room from "../../backend/models/room";
 import RoomCreateOrJoin from "./components/RoomCreateOrJoin";
 import "./index.css";
+
 //TODO: finsih up intitializing opinion and changing opinion
 /**
- * Temporary Home component
+ * Home component
  * @returns Home component
  */
 const Home = () => {
-  const [userData, setUserData] = useState(null);
   const defaultRoomId = "test";
   let { roomId = defaultRoomId } = useParams();
-  const [rankedList, setRankedList] = useState([]);
-  const [opinionList, setOpinionList] = useState([]);
+
+  // Mostly static data
+  const [userData, setUserData] = useState(null);
   const [authenticated, setAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const [opinion, setOpinion] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [myOpinion, setMyOpinion] = useState(null);
   const navigate = useNavigate();
+
   /**
-   * sends opinion to server
-   * @param {*} roomId
-   * @param {*} userId
-   */
+   * This function logs out the user
+   * @returns null
+   * */
   const logout = async () => {
     try {
       const response = await axios.post(
@@ -45,31 +43,7 @@ const Home = () => {
       console.error("Error logging out:", error);
     }
   };
-  const initOpinion = async (roomId, userId) => {
-    const test = {
-      Apple: 100,
-      Banana: 2,
-      Kiwi: 3,
-      Orange: 4,
-      Pineapple: 5,
-      Tomato: 6,
-      Peaches: 7,
-    };
-    const payload = { [userId]: test };
 
-    try {
-      // NEED user data
-      console.log("initOpinion", roomId);
-      const response = await axios.post(
-        `http://localhost:5555/room${roomId}/opinions`,
-        payload,
-        { withCredentials: true }
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error pushing opinion to user:", error);
-    }
-  };
   /**
    * This function obtains all the users rooms
    * @param {*} userId The userId we get rooms from
@@ -148,32 +122,6 @@ const Home = () => {
     }
   };
   /**
-   * Fetches room data
-   */
-  const fetchRoomData = async () => {
-    try {
-      // Fetch room data including the ranked list, opinions, and users
-      const response = await axios.get(`http://localhost:5555/room${roomId}`, {
-        withCredentials: true,
-      });
-      setRankedList(response.data.room.defaultRankedList);
-      setOpinionList(response.data.room.avgOpinion);
-      setUsers(response.data.room.users);
-      const id = response.data.userId;
-
-      // could be more efficient, should always have a opinion as the call creates a default opinion
-      for (let i = 0; i < response.data.room.opinions.length; i++) {
-        if (response.data.room.opinions[i].userId === id) {
-          setMyOpinion(response.data.room.opinions[i].opinions);
-          console.log("found");
-          break;
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching room data:", error);
-    }
-  };
-  /**
    * fetches user data
    */
   const fetchData = async () => {
@@ -200,15 +148,11 @@ const Home = () => {
       console.error("cant find jwt token", error);
       setAuthenticated(false);
       setUserData(null);
-      setRankedList(null);
-      setOpinionList(null);
-      setUsers(null);
     }
   };
 
   useEffect(() => {
     console.log("useEffect Started for", roomId);
-    fetchRoomData();
     fetchData();
   }, [roomId]);
 
@@ -258,10 +202,7 @@ const Home = () => {
                   </div>
                   <div className=" ">
                     <CurrentRankedList
-                      rankedList={rankedList}
-                      rname={roomId}
-                      ol={opinionList}
-                      myOpinion={myOpinion}
+                      udata={userData}
                     />
                   </div>
                 </div>
@@ -270,7 +211,7 @@ const Home = () => {
                     <AllUsers
                       userList={users}
                       roomId={roomId}
-                      opinionList={opinionList}
+                      //opinionList={opinionList}
                     />
                   </div>
                 </div>

@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import Switch from "./button/Button";
 import "./button/styles.css";
 import "../index.css";
 import { all } from "axios";
-
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 /**
  * This function is the current ranked list component
  * It displays the current ranked list of items and the opinions of the user
@@ -19,30 +21,94 @@ import { all } from "axios";
  * @returns
  * The current ranked lists component
  */
-const CurrentRankedList = ({ rankedList, rname: roomname, ol: avgOpinion, myOpinion}) => {
-  // rname = roomID
-  // rankedList = DefaultRankedList
-  // opinons = avgopinions
+const CurrentRankedList = ({
+  // rankedList,
+  // rdata,
+  // ol: avgOpinion,
+  // myOpinion,
+  udata,
+}) => {
+  // needed to make the call to the backend
+  const defaultRoomId = "test";
+  let { roomId = defaultRoomId } = useParams();
+  console.log(roomId, "roomid");
 
-  // console.log("userList: ", rankedList);
-  // console.log("Room Id: ", roomname);
-  // console.log("Opinions: ", opinons);
-  // userOpinion = opinonion.userid
-  // console.log(typeof myOpinion)
-  // console.log(Object.entries(myOpinion))
-  const rankedListArray = Object.entries(myOpinion);
-  const opinions = Object.entries(avgOpinion);
+  // found in room call
+  // const roomname = rdata.roomname;
+  // const creator = rdata.creator;
+  const user = udata.userId;
+  // const rankedListArray = Object.entries(myOpinion);
+  // const opinions = Object.entries(avgOpinion);
+  // 
+  
+  const [creator, setCreator] = useState("");
+  const [myRankedList, setMyRankedList] = useState([]);
+  const [opinions, setOpinions] = useState([]);
+  
+
+  // only in the componnent itself
+  const [item, setItem] = useState("");
   const [selectedOption, setSelectedOption] = useState("Me");
+  const navigate = useNavigate();
+
+  /**
+   * Fetches room data
+   */
+  const fetchRoomData = async () => {
+    try {
+      // Fetch room data including the ranked list, opinions, and users
+      const response = await axios.get(`http://localhost:5555/room${roomId}`, {
+        withCredentials: true,
+      });
+      setCreator(response.data.room.creator);
+      const avgOpinion = response.data.room.avgOpinion;
+      setOpinions(Object.entries(avgOpinion));
+      const id = response.data.userId;
+      // could be more efficient, should always have a opinion as the call creates a default opinion
+      for (let i = 0; i < response.data.room.opinions.length; i++) {
+        if (response.data.room.opinions[i].userId === id) {
+          const myOpinion = response.data.room.opinions[i].opinions;
+          setMyRankedList(Object.entries(myOpinion));
+          console.log("found");
+          break;
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching room data:", error);
+    }
+  };
 
   const handleAddition = (event) => {
     event.preventDefault();
+    // console.log(item)
+    try {
+      const response = axios.put(
+        `http://localhost:5555/room${roomId}/item`,
+        { item: item },
+        { withCredentials: true }
+      );
+      console.log(typeof navigate());
+      navigate(`/list/${roomId}`);
+      setItem("");
+    } catch (error) {
+      console.log("Error adding item to list", error);
+    }
   };
-
+  const handleDelete = (event) => {
+    event.preventDefault();
+    axios.delete(`http://localhost:5555/room${roomId}/item`, {
+      data: { item: item },
+      withCredentials: true,
+    });
+    navigate(`/list/${roomId}`);
+  };
   const handleSwitchChange = (option) => {
     setSelectedOption(option);
     console.log("Switched to", option);
   };
-
+  useEffect(() => {
+    fetchRoomData();
+  }, [roomId]);
   return (
     <div>
       <div className="flex justify-center mt-6 mb-4">
@@ -53,10 +119,10 @@ const CurrentRankedList = ({ rankedList, rname: roomname, ol: avgOpinion, myOpin
       {selectedOption === "Me" && (
         <div className="flex justify-center mb-10 ">
           <ul className="border border-black border-solid rounded">
-            {rankedListArray
+            {myRankedList
               .sort((a, b) => a[1] - b[1]) // Sort the array by value
               .map(([key, value]) => (
-                <li key={value}>
+                <li key={key}>
                   <strong>{value}</strong>: {key}
                 </li>
               ))}
@@ -65,39 +131,52 @@ const CurrentRankedList = ({ rankedList, rname: roomname, ol: avgOpinion, myOpin
       )}
 
       {selectedOption !== "Me" && (
-        <div className="flex justify-center mb-10">
-          <ul className="border border-black border-solid rounded">
+        <div className="flex justify-center mb-10 ">
+          <ul className="max-h-[600px] overflow-y-scroll">
             {opinions
               .sort((a, b) => a[1] - b[1]) // Sort the array by value
-              .map(([key, index]) => (
-                <li key={index} className="text-3xl p-4">
-                  <strong>{index}</strong>: {key}
+              .map(([key, value]) => (
+                <li
+                  key={key}
+                  className="text-3xl p-4 border border-black border-solid rounded-3xl mb-3 "
+                >
+                  <strong>{value}</strong>: {key}
                 </li>
               ))}
           </ul>
         </div>
       )}
 
-      <div className="w-64 mx-auto">
-        <form className="flex flex-col gap-4">
-          <div className="flex items-center mb-1 ">
-            <input
-              type="text"
-              placeholder="Add to list"
-              autoComplete="off"
-              name="email"
-              className="w-4/6 px-3 py-2 border-b text-sm border-gray-400  mr-2"
-              onSubmit={handleAddition}
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-2 rounded"
-            >
-              Submit
-            </button>
-          </div>
-        </form>
-      </div>
+      {(creator === user || udata.username === "admin") && (
+        <div className="w-64 mx-auto border border-black border-solid rounded p-3">
+          <form className="flex flex-col gap-4" onSubmit={handleAddition}>
+            <div className="flex items-center mb-1 ">
+              <input
+                type="text"
+                placeholder="Add to list"
+                autoComplete="off"
+                name="email"
+                className="w-4/6 px-3 py-2 border-b text-sm border-gray-400  mr-2"
+                value={item}
+                onChange={(e) => setItem(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-2 rounded"
+              >
+                Submit
+              </button>
+              <button
+                type="submit"
+                className="bg-red-500 hover:bg-red-700 text-white text-xs font-bold py-2 px-2 rounded"
+                onClick={handleDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 };
