@@ -519,7 +519,6 @@ app.delete("/room:id/item", async (request, response) => {
           return;
         }
       }
-      console.log("room found + authorized");
 
       let item = request.body.item;
       if (item === "") {
@@ -532,7 +531,6 @@ app.delete("/room:id/item", async (request, response) => {
         response.status(400).send("Item not found in room");
         return;
       }
-      console.log("item to delete: ", item);
       // reset the default ranked list to orderd list 1-n
       const newRankedList = new Map();
       let i = 1;

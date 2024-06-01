@@ -9,11 +9,11 @@ import { useEffect } from "react";
  */
 const AllUsers = ({ userList }) => {
   return (
-    <div className="border border-solid border-black rounded">
+    <div className="border border-solid border-black rounded max-w-64">
       <div className="border-b border-solid border-black flex justify-center">
           <h2 className="font-bold">Users</h2>
         </div>
-      <div className="border-t-2 border-solid border-black ">
+      <div className="border-t-2 border-solid border-black max-h-64 overflow-y-scroll ">
         {userList.map((username, index) => (
           <li key={index}className="list-none">
             <ol  className="px-4 text-xl ">{username}</ol>

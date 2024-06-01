@@ -15,3 +15,4 @@
 2) redundant calls.
 3) opinions is a list of dicts if possible should be a dicts of dicts.
 4) make loading text spining wheels.
+5) Cannot send text with periods 😂😂
