@@ -376,7 +376,7 @@ app.get("/room:id", async (request, response) => {
         );
         if (!userOpinion) {
           // If the user's opinion doesn't exist, add it with the default ranked list
-          console.log("User opinion not found")
+          console.log("User opinion not found");
           room.opinions.push({
             userId: decoded.userId,
             opinions: room.defaultRankedList,
@@ -449,13 +449,25 @@ app.put("/room:id/item", async (request, response) => {
     }
 
     Room.findOne({ roomname: request.params.id }).then((room) => {
-      if (!room || decoded.userId !== room.creator|| !decoded.username === "admin") {
+      if (
+        !room ||
+        decoded.userId !== room.creator ||
+        !decoded.username === "admin"
+      ) {
         response.status(401).send("not authorized");
         return;
       }
-      console.log("room found + authorized")
+      console.log("room found + authorized");
 
       const item = request.body.item;
+      if (item === "") {
+        response.status(400).send("Item cannot be empty");
+        return;
+      }
+      if (room.defaultRankedList.has(item)) {
+        response.status(400).send("Item already exists in room");
+        return;
+      }
       // reset the default ranked list to orderd list 1-n
       const newRankedList = new Map();
       let i = 1;
@@ -476,7 +488,7 @@ app.put("/room:id/item", async (request, response) => {
       room
         .save()
         .then(() => {
-          console.log("room saved added: ", item)
+          console.log("room saved added: ", item);
           response.status(200).send("Item added to room successfully");
         })
         .catch((error) => {
@@ -506,11 +518,15 @@ app.delete("/room:id/item", async (request, response) => {
     }
 
     Room.findOne({ roomname: request.params.id }).then((room) => {
-      if (!room || decoded.userId !== room.creator|| !decoded.username === "admin") {
+      if (
+        !room ||
+        decoded.userId !== room.creator ||
+        !decoded.username === "admin"
+      ) {
         response.status(401).send("not authorized");
         return;
       }
-      console.log("room found + authorized")
+      console.log("room found + authorized");
 
       let item = request.body.item;
       if (item === "") {
@@ -523,7 +539,7 @@ app.delete("/room:id/item", async (request, response) => {
         response.status(400).send("Item not found in room");
         return;
       }
-      console.log("item to delete: ", item)
+      console.log("item to delete: ", item);
       // reset the default ranked list to orderd list 1-n
       const newRankedList = new Map();
       let i = 1;
