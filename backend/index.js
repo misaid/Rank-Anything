@@ -55,7 +55,56 @@ app.post("/verifyjwt", async (request, response) => {
     response.status(401).json({ valid: false });
   }
 });
-
+/**
+ * Create a temp user for people who do not want to register
+ */
+app.post("/tempuser", async (request, response) => {
+  try {
+    // Create a temp user
+    //username in style of user-<random number>
+    const username = "user-" + Math.floor(Math.random() * 1000000);
+    console.log("Creating temp user: ", username )
+    const newUser = {
+      username: username,
+      password: bcrypt.hashSync("password", 10),
+    };
+    User.create(newUser)
+      .then((user) => {
+        console.log("User created");
+        // Create a safe user object to store in the safe user collection
+        SafeUser.create({ _id: user._id, username: username })
+        .then(() => {
+          const token = jsonwebtoken.sign(
+            { userId: user._id, username: user.username, authLevel: "user" },
+            secretKey,
+            { expiresIn: "30d" }
+          );
+          response.cookie("jwt", token, {
+            httpOnly: true,
+            secure: process.env.node_env === "production",
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+            // sameSite: 'lax',
+            domain: "localhost",
+            // path: '/',
+          });
+          console.log("Safe user created for temp user");
+          console.log("Cookie created for temp user", token)
+          response.status(200).send({ username: username });
+        })
+        .catch((error) => {
+          console.error("Error creating safe user:", error);
+          response.status(500).send("Internal Server Error");
+        });
+      })
+      .catch((error) => {
+        console.error("Error creating user:", error);
+        response.status(500).send("Internal Server Error");
+      });
+  }catch (error) {
+    console.log(error.message);
+    response.status(500).send({ message: error.message });
+  }}
+);
 /**
  * User paswords are hashed with bcrypt so we have to compare the hashed password to the user input here.
  */
@@ -175,6 +224,8 @@ app.post("/logout", async (request, response) => {
 app.post("/user:id/room",verifyJWT, async (request, response) => {
   // get cookies and insure user = username
   try {
+    // console.log(request.user);
+    // console.log("adding room to user")
     const decoded = request.user;
     // console.log(decoded.userId, request.params.id);
     if (decoded.userId !== request.params.id) {
@@ -208,9 +259,30 @@ app.post("/user:id/room",verifyJWT, async (request, response) => {
     response.status(500).send({ message: error.message });
   }
 });
+
+/**
+ * Add a user to a room
+ */
+app.post("/room:id/user",verifyJWT, async (request, response) => {
+  try {
+    // console.log(request.user);
+    // console.log("adding room to user")
+    const room = await Room.findOneAndUpdate(
+      { roomname: request.params.id },
+      { $addToSet: { users: request.body.username } }, // Use $addToSet to ensure uniqueness
+      { new: true, upsert: false }
+    );
+
+    response.status(200).send("User added to room successfully");
+  } catch (error) {
+    console.error("Error adding user to room:", error);
+    response.status(500).send("Internal Server Error");
+  }
+});
+
 /**
  * Get Rooms from user
- */
+*/
 app.get("/user:id/rooms",verifyJWT, async (request, response) => {
   // verify user id matches cookie
   const decoded = request.user;
@@ -234,6 +306,7 @@ app.get("/user:id/rooms",verifyJWT, async (request, response) => {
   }
 });
 
+
 /**
  * change user opinion in room
  */
@@ -250,7 +323,6 @@ app.put("/room:id/opinion",verifyJWT, async (request, response) => {
       for (const entry of room.opinions) {
         if (entry.userId === decoded.userId) {
           //verify that the opinion is valid
-          console.log(room.defaultRankedList)
           for (const [key, value] of userOpinion.entries()) {
             if (!room.defaultRankedList.has(value[0])) {
               console.log("Invalid item: ", key, " in ", userOpinion);
@@ -262,7 +334,6 @@ app.put("/room:id/opinion",verifyJWT, async (request, response) => {
           // verify that max number is 1 + list.size
           // verify that all values are positive 
           const maxNumber = room.defaultRankedList.size+1
-          console.log("Max number: ", maxNumber)
           let sum = 0;
           for (const [key, value] of userOpinion.entries()) {
             if (value[1] < 0 || value[1] > maxNumber) {
@@ -426,23 +497,6 @@ app.get("/room:id",verifyJWT, async (request, response) => {
   }
 });
 
-/**
- * Add a user to a room
- */
-app.post("/room:id/user",verifyJWT, async (request, response) => {
-  try {
-    const room = await Room.findOneAndUpdate(
-      { roomname: request.params.id },
-      { $addToSet: { users: request.body.username } }, // Use $addToSet to ensure uniqueness
-      { new: true, upsert: false }
-    );
-
-    response.status(200).send("User added to room successfully");
-  } catch (error) {
-    console.error("Error adding user to room:", error);
-    response.status(500).send("Internal Server Error");
-  }
-});
 
 /**
  * add item to room

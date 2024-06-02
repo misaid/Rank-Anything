@@ -114,7 +114,7 @@ const Home = () => {
         `http://localhost:5555/room${roomId}/user`,
         {
           username: username,
-        }
+        }, { withCredentials: true}
       );
       //console.log(response.data);
     } catch (error) {

@@ -8,7 +8,15 @@ function Login() {
   const [password, setPassword] = useState();
   const [invalid, setInvalid] = useState(false);
   const navigate = useNavigate();
-
+  const handleTempUser = async (event) => {
+    try {
+      await axios.post('http://localhost:5555/tempuser',{}, {withCredentials: true});
+      navigate('/')
+    }
+    catch (error) {
+      console.log("Failed to login as guest")
+    }
+  }
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -55,13 +63,17 @@ function Login() {
               className="w-full px-3 py-2 border border-gray-300 rounded" 
               onChange={(e) => setPassword(e.target.value)}/>
           </div>
-          {invalid ? ( <p className='text-red-500'>Invalid username or password</p>):( <div className='h-4'></div>)}
+          {invalid && ( <p className='text-red-500'>Invalid username or password</p>)}
           <button type='submit' className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
             Login
           </button>
           <button className='bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded' onClick={handleRegister}>
             Register
           </button>
+          <div className='select-none' onClick={handleTempUser}>
+          <h2 className='text-gray-500 hover:text-gray-700 font-bold pt-2 pb-1 px-4 border-b border-gray-500' >
+            Continue as Guest
+          </h2></div>
         </form>
       </div>
     </div>
