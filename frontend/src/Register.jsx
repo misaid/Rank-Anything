@@ -14,12 +14,14 @@ function Register() {
   const [password1, setPassword1] = useState('');
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-
+  const axiosInstance = axios.create({
+    baseURL: import.meta.env.VITE_APP_API_URL,
+  });
 
   const handleSubmit = (event) => {
     event.preventDefault();
     if (password === password1) {
-      axios.post('http://localhost:5555/register', { username, password })
+      axiosInstance.post('/register', { username, password })
         .then(result => {
           console.log(result)
           navigate('/login')

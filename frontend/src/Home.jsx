@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { redirect, useNavigate, useParams } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
+//import dotenv from "dotenv";
 // Components
 import AllUsers from "./components/AllUsers";
 import CurrentRankedList from "./components/CurrentRankedList";
@@ -19,7 +20,6 @@ import logoutImage from "./assets/logout.png";
 const Home = () => {
   const defaultRoomId = "test";
   let { roomId = defaultRoomId } = useParams();
-
   // Mostly static data
   const [userData, setUserData] = useState(null);
   const [authenticated, setAuthenticated] = useState(false);
@@ -28,14 +28,17 @@ const Home = () => {
   const [rooms, setRooms] = useState([]);
   const navigate = useNavigate();
 
+  const axiosInstance = axios.create({
+    baseURL: import.meta.env.VITE_APP_API_URL,
+  });
   /**
    * This function logs out the user
    * @returns null
    * */
   const logout = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5555/logout",
+      const response = await axiosInstance.post(
+        "/logout",
         {},
         { withCredentials: true }
       );
@@ -59,8 +62,8 @@ const Home = () => {
       return;
     }
     try {
-      const response = await axios.get(
-        `http://localhost:5555/user${userId}/rooms`,
+      const response = await axiosInstance.get(
+        `/user${userId}/rooms`,
         { withCredentials: true }
       );
       setRooms(response.data);
@@ -80,23 +83,23 @@ const Home = () => {
       return;
     }
     try {
-      const roomCheckResponse = await axios.get(
-        `http://localhost:5555/room${roomId}`,
+      const roomCheckResponse = await axiosInstance.get(
+        `/room${roomId}`,
         { withCredentials: true }
       );
       if (!roomCheckResponse.data.room) {
         console.error("Room does not exist");
         return;
       }
-      const response = await axios.post(
-        `http://localhost:5555/user${userId}/room`,
+      const response = await axiosInstance.post(
+        `/user${userId}/room`,
         {
           roomId: roomId,
         },
         { withCredentials: true }
       );
       // console.log(roomCheckResponse.data)
-      await setUsers(roomCheckResponse.data.room.users);
+      setUsers(roomCheckResponse.data.room.users);
 
       //console.log(response.data);
     } catch (error) {
@@ -114,8 +117,8 @@ const Home = () => {
       return;
     }
     try {
-      const response = await axios.post(
-        `http://localhost:5555/room${roomId}/user`,
+      const response = await axiosInstance.post(
+        `/room${roomId}/user`,
         {
           username: username,
         },
@@ -131,8 +134,8 @@ const Home = () => {
    */
   const fetchData = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5555/verifyjwt",
+      const response = await axiosInstance.post(
+        "/verifyjwt",
         {},
         {
           withCredentials: true,

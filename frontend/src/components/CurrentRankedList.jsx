@@ -41,6 +41,11 @@ const CurrentRankedList = ({ udata }) => {
   const [item, setItem] = useState("");
   const [selectedOption, setSelectedOption] = useState("Me");
   const navigate = useNavigate();
+
+  // Axios instance
+  const axiosInstance = axios.create({
+    baseURL: import.meta.env.VITE_APP_API_URL,
+  });
   
   /**
    * Handles the drag end event
@@ -74,8 +79,8 @@ const CurrentRankedList = ({ udata }) => {
   */
  const putMyOpinion = async ( dndOpinion ) => {
    try {
-     const response = await axios.put(
-       `http://localhost:5555/room${roomId}/opinion`,
+     const response = await axiosInstance.put(
+       `/room${roomId}/opinion`,
        { opinion: dndOpinion },
        { withCredentials: true }
       );
@@ -91,7 +96,7 @@ const CurrentRankedList = ({ udata }) => {
    try {
      setLoading(true);
      // Fetch room data including the ranked list, opinions, and users
-     const response = await axios.get(`http://localhost:5555/room${roomId}`, {
+     const response = await axiosInstance.get(`/room${roomId}`, {
        withCredentials: true,
       });
       setCreator(response.data.room.creator);
@@ -126,8 +131,8 @@ const CurrentRankedList = ({ udata }) => {
     // console.log(item)
     
     try {
-      const response = await axios.put(
-        `http://localhost:5555/room${roomId}/item`,
+      const response = await axiosInstance.put(
+        `/room${roomId}/item`,
         { item: item },
         { withCredentials: true }
       );
@@ -160,8 +165,8 @@ const CurrentRankedList = ({ udata }) => {
   const handleDelete = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.delete(
-        `http://localhost:5555/room${roomId}/item`,
+      const response = await axiosInstance.delete(
+        `/room${roomId}/item`,
         {
           data: { item: item },
           withCredentials: true,

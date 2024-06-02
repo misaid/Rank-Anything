@@ -12,6 +12,10 @@ const RoomCreateOrJoin = () => {
   const [snackPack, setSnackPack] = React.useState([]);
   const [messageInfo, setMessageInfo] = React.useState(undefined);
   const [open, setOpen] = React.useState(false);
+  // axio instance
+  const axiosInstance = axios.create({
+    baseURL: import.meta.env.VITE_APP_API_URL,
+  });
   /**
    * This function handles the exit of a snackbar
    */
@@ -44,8 +48,8 @@ const RoomCreateOrJoin = () => {
       return;
     }
     try {
-      const response = await axios.post(
-        `http://localhost:5555/room${croomId}`,
+      const response = await axiosInstance.post(
+        `/room${croomId}`,
         {},
         {
           withCredentials: true,
@@ -71,7 +75,7 @@ const RoomCreateOrJoin = () => {
     }
     console.log("Joining room", roomId);
     try {
-      const response = await axios.get(`http://localhost:5555/room${roomId}`, {
+      const response = await axiosInstance.get(`/room${roomId}`, {
         withCredentials: true,
       });
       if (response.status !== 200) {
