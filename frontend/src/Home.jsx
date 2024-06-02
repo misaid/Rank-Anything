@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { redirect, useNavigate, useParams } from "react-router-dom";
+import { CircularProgress } from "@mui/material";
+// Components
 import AllUsers from "./components/AllUsers";
 import CurrentRankedList from "./components/CurrentRankedList";
-import { redirect, useNavigate, useParams } from "react-router-dom";
 import YourRooms from "./components/YourRooms";
 import RoomCreateOrJoin from "./components/RoomCreateOrJoin";
 import "./index.css";
 // Images
-import rankingImage from './assets/ranking.png';
-import logoutImage from './assets/logout.png';
+import rankingImage from "./assets/ranking.png";
+import logoutImage from "./assets/logout.png";
+
 /**
  * Home component
  * @returns Home component
@@ -115,7 +118,8 @@ const Home = () => {
         `http://localhost:5555/room${roomId}/user`,
         {
           username: username,
-        }, { withCredentials: true}
+        },
+        { withCredentials: true }
       );
       //console.log(response.data);
     } catch (error) {
@@ -175,7 +179,8 @@ const Home = () => {
                   className="p-6  flex border border-black border-solid cursor-pointer"
                   onClick={logout}
                 >
-                  <p>Logout, </p> <img src={logoutImage} className = " ml-4 h-6"alt="Logout" />
+                  <p>Logout, </p>{" "}
+                  <img src={logoutImage} className=" ml-4 h-6" alt="Logout" />
                 </div>
               </div>
               {/* <div className="">
@@ -202,9 +207,7 @@ const Home = () => {
                     </h1>
                   </div>
                   <div className=" ">
-                    <CurrentRankedList
-                      udata={userData}
-                    />
+                    <CurrentRankedList udata={userData} />
                   </div>
                 </div>
                 <div className="flex-1 m-5 mt-60 ">
@@ -223,7 +226,12 @@ const Home = () => {
           )}
         </div>
       ) : (
-        <p> Loading</p>
+        <div className="flex justify-center items-center h-screen">
+          <div className="flex ">
+          <p> Loading...</p>
+          <CircularProgress />
+          </div>
+        </div>
       )}
     </div>
   );
