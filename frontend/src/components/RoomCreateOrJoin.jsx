@@ -1,38 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Snackbar from '@mui/material/Snackbar';
-
+import Snackbar from "@mui/material/Snackbar";
 
 const RoomCreateOrJoin = () => {
   const [roomId, setRoomId] = useState("");
   const [croomId, setCRoomId] = useState("");
   const navigate = useNavigate();
 
-
   // code from https://material-ui.com/components/snackbars/
   const [snackPack, setSnackPack] = React.useState([]);
   const [messageInfo, setMessageInfo] = React.useState(undefined);
   const [open, setOpen] = React.useState(false);
-
-  React.useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      // Set a new snack when we don't have an active one
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
-      setOpen(true);
-    } else if (snackPack.length && messageInfo && open) {
-      // Close an active snack when a new one is added
-      setOpen(false);
-    }
-  }, [snackPack, messageInfo, open]);
+  /**
+   * This function handles the exit of a snackbar
+   */
   const handleExited = () => {
     setMessageInfo(undefined);
   };
+  /**
+   * This function handles the closing of a snackbar
+   */
   const handleClose = () => {
     setOpen(false);
   };
 
+  /**
+   * This function creates a room
+   * @param {Event} event The event that triggered the function
+   * @returns null
+   * */
   const handleCreateRoom = async (event) => {
     event.preventDefault();
     if (!croomId) {
@@ -48,20 +45,25 @@ const RoomCreateOrJoin = () => {
     }
     try {
       const response = await axios.post(
-        `http://localhost:5555/room${croomId}`,{},
+        `http://localhost:5555/room${croomId}`,
+        {},
         {
           withCredentials: true,
-        },
+        }
       );
       navigate(`/list/${croomId}`);
       setRoomId("");
       setCRoomId("");
     } catch (error) {
-      const message = "Room already exists";  
+      const message = "Room already exists";
       setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
       console.log("Room creation failed");
     }
   };
+
+  /**
+   * This function joins a room
+   */
   const handleJoinRoom = async (event) => {
     event.preventDefault();
     if (!roomId) {
@@ -82,11 +84,24 @@ const RoomCreateOrJoin = () => {
       setCRoomId("");
       setRoomId("");
     } catch (error) {
-      const message = "Room does not exist";  
+      const message = "Room does not exist";
       setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
       console.log("Room join failed");
     }
   };
+
+  React.useEffect(() => {
+    if (snackPack.length && !messageInfo) {
+      // Set a new snack when we don't have an active one
+      setMessageInfo({ ...snackPack[0] });
+      setSnackPack((prev) => prev.slice(1));
+      setOpen(true);
+    } else if (snackPack.length && messageInfo && open) {
+      // Close an active snack when a new one is added
+      setOpen(false);
+    }
+  }, [snackPack, messageInfo, open]);
+
   return (
     <div className="w-full border border-black rounded-xl">
       <Snackbar

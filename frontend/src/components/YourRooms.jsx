@@ -4,6 +4,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+/**
+ * This is the your rooms component. It displays the rooms that the user is in
+ * @param {Array} roomList
+ * The list of rooms
+ * @returns
+ * The yourRooms component
+ */
 const YourRooms = ({ roomList }) => {
   const navigate = useNavigate();
   const handleClick = (event) => {

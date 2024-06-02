@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect } from "react";
 /**
  * This is the all user component. It displays all the users in the room
- * @param {*} userList
+ * @param {Array} userList
  * The list of users 
  * @returns 
  * The all user component

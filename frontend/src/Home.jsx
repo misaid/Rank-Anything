@@ -7,7 +7,6 @@ import YourRooms from "./components/YourRooms";
 import RoomCreateOrJoin from "./components/RoomCreateOrJoin";
 import "./index.css";
 
-//TODO: finsih up intitializing opinion and changing opinion
 /**
  * Home component
  * @returns Home component
@@ -46,7 +45,7 @@ const Home = () => {
 
   /**
    * This function obtains all the users rooms
-   * @param {*} userId The userId we get rooms from
+   * @param {String} userId The userId we get rooms from
    * @returns null
    */
   const getRoomsfromUser = async (userId) => {
@@ -66,8 +65,8 @@ const Home = () => {
   };
   /**
    * This function adds a room to a user object
-   * @param {*} roomId The room id to add to the user
-   * @param {*} userId the user that room id will be added to
+   * @param {String} roomId The room id to add to the user
+   * @param {String} userId the user that room id will be added to
    * @returns null
    */
   const addRoomToUser = async (roomId, userId) => {
@@ -101,8 +100,8 @@ const Home = () => {
   };
   /**
    * adds user to room
-   * @param {*} roomId
-   * @param {*} username
+   * @param {String} roomId
+   * @param {String} username
    * @returns
    */
   const addUserToRoom = async (roomId, username) => {

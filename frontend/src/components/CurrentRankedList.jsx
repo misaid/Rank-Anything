@@ -13,7 +13,7 @@ import Snackbar from '@mui/material/Snackbar';
  * It displays the current ranked list of items and the opinions of the user
  * it also allows for users to switch between the ranked list and the opinions
  * it also allows for users to change and submit ther opinions
- * @param {*} udata
+ * @param {Object} udata
  * The user data (static) we are only using userId from this
  * @returns
  * The current ranked list component
@@ -30,45 +30,28 @@ const CurrentRankedList = ({ udata }) => {
   const [messageInfo, setMessageInfo] = React.useState(undefined);
   const [open, setOpen] = React.useState(false);
 
-  React.useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      // Set a new snack when we don't have an active one
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
-      setOpen(true);
-    } else if (snackPack.length && messageInfo && open) {
-      // Close an active snack when a new one is added
-      setOpen(false);
-    }
-  }, [snackPack, messageInfo, open]);
-  const handleExited = () => {
-    setMessageInfo(undefined);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-
+  
+  
   const [loading, setLoading] = useState(false);
   const [creator, setCreator] = useState("");
   const [myRankedList, setMyRankedList] = useState([]);
   const [opinions, setOpinions] = useState([]);
-
+  
   // only in the componnent itself
   const [item, setItem] = useState("");
   const [selectedOption, setSelectedOption] = useState("Me");
   const navigate = useNavigate();
-
+  
   /**
    * Handles the drag end event
-   * @param {*} result
+   * @param {Event} result
    * The result of the drag end event
    * @returns
    * null
    * */
   const handleOnDragEnd = (result) => {
     if (!result.destination) return;
-
+    
     // indexed by 1
     const items = Array.from(myRankedList);
     const [reorderedItem] = items.splice(result.source.index, 1);
@@ -81,16 +64,20 @@ const CurrentRankedList = ({ udata }) => {
     putMyOpinion(updatedItems);
     setMyRankedList(updatedItems);
   };
-
+  
   /**
    * put myOpinon to the backend
-   */
-  const putMyOpinion = async ( dndOpinion ) => {
-    try {
-      const response = await axios.put(
-        `http://localhost:5555/room${roomId}/opinion`,
-        { opinion: dndOpinion },
-        { withCredentials: true }
+   * @param {String} dndOpinion
+   * The new opinion to be put
+   * @returns
+   * null
+  */
+ const putMyOpinion = async ( dndOpinion ) => {
+   try {
+     const response = await axios.put(
+       `http://localhost:5555/room${roomId}/opinion`,
+       { opinion: dndOpinion },
+       { withCredentials: true }
       );
       console.log("Opinion updated");
     } catch (error) {
@@ -99,16 +86,16 @@ const CurrentRankedList = ({ udata }) => {
   };
   /**
    * Fetches room data
-   */
-  const fetchRoomData = async () => {
-    try {
-      setLoading(true);
-      // Fetch room data including the ranked list, opinions, and users
-      const response = await axios.get(`http://localhost:5555/room${roomId}`, {
-        withCredentials: true,
+  */
+ const fetchRoomData = async () => {
+   try {
+     setLoading(true);
+     // Fetch room data including the ranked list, opinions, and users
+     const response = await axios.get(`http://localhost:5555/room${roomId}`, {
+       withCredentials: true,
       });
       setCreator(response.data.room.creator);
-
+      
       const avgOpinion = response.data.room.avgOpinion;
       setOpinions(Object.entries(avgOpinion));
       const id = response.data.userId;
@@ -126,10 +113,10 @@ const CurrentRankedList = ({ udata }) => {
       console.error("Error fetching room data:", error);
     }
   };
-
+  
   /**
    * Handles the addition of an item to the ranked list
-   * @param {*} event
+   * @param {Event} event
    * The event that triggers the function
    * @returns
    * null
@@ -137,7 +124,7 @@ const CurrentRankedList = ({ udata }) => {
   const handleAddition = async (event) => {
     event.preventDefault();
     // console.log(item)
-
+    
     try {
       const response = await axios.put(
         `http://localhost:5555/room${roomId}/item`,
@@ -162,10 +149,10 @@ const CurrentRankedList = ({ udata }) => {
       console.log("Error adding item to list", error);
     }
   };
-
+  
   /**
    * Handles the deletion of an item from the ranked list
-   * @param {*} event
+   * @param {Event} event
    * The event that triggers the function
    * @returns
    * null
@@ -190,7 +177,7 @@ const CurrentRankedList = ({ udata }) => {
       console.log("Error deleting item from list", error);
     }
   };
-
+  
   /**
    * Handles the switch change
    * @param {*} option
@@ -203,10 +190,28 @@ const CurrentRankedList = ({ udata }) => {
     fetchRoomData();
     console.log("Switched to", option);
   };
-
+  
   useEffect(() => {
     fetchRoomData();
   }, [roomId]);
+  
+  React.useEffect(() => {
+    if (snackPack.length && !messageInfo) {
+      // Set a new snack when we don't have an active one
+      setMessageInfo({ ...snackPack[0] });
+      setSnackPack((prev) => prev.slice(1));
+      setOpen(true);
+    } else if (snackPack.length && messageInfo && open) {
+      // Close an active snack when a new one is added
+      setOpen(false);
+    }
+  }, [snackPack, messageInfo, open]);
+  const handleExited = () => {
+    setMessageInfo(undefined);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <div>
@@ -220,7 +225,7 @@ const CurrentRankedList = ({ udata }) => {
         onClose={handleClose}
         TransitionProps={{ onExited: handleExited }}
         message={messageInfo ? messageInfo.message : undefined}
-      />
+        />
       </div>
       {/* {loading ? (
         
