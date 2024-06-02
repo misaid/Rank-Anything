@@ -5,3 +5,4 @@
 /frontend/package-lock.json
 /frontend/node_modules
 .vscode
+ecosytem.config.js
