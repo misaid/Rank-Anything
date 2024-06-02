@@ -6,6 +6,7 @@ import axios from 'axios';
 function Login() {
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
+  const [invalid, setInvalid] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -18,6 +19,8 @@ function Login() {
       );
       navigate('/')
     } catch (error) {
+      // notify the user that login failed
+      setInvalid(true);
       console.log("Login failed")
     }
   };
@@ -41,7 +44,7 @@ function Login() {
               onChange={(e) => setUsername(e.target.value)}
               />
           </div>
-          <div className="flex items-center mb-4">
+          <div className="flex items-center">
             <label htmlFor='password' className='mr-2'>
               <strong>Password</strong>
             </label>
@@ -52,6 +55,7 @@ function Login() {
               className="w-full px-3 py-2 border border-gray-300 rounded" 
               onChange={(e) => setPassword(e.target.value)}/>
           </div>
+          {invalid ? ( <p className='text-red-500'>Invalid username or password</p>):( <div className='h-4'></div>)}
           <button type='submit' className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
             Login
           </button>

@@ -5,7 +5,9 @@ import "../index.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import Snackbar from '@mui/material/Snackbar';
+
 /**
  * This function is the current ranked list component
  * It displays the current ranked list of items and the opinions of the user
@@ -20,8 +22,32 @@ const CurrentRankedList = ({ udata }) => {
   // needed to make the call to the backend
   const defaultRoomId = "test";
   let { roomId = defaultRoomId } = useParams();
-
   const user = udata.userId;
+
+
+// code from https://mui.com/components/snackbars/
+  const [snackPack, setSnackPack] = React.useState([]);
+  const [messageInfo, setMessageInfo] = React.useState(undefined);
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (snackPack.length && !messageInfo) {
+      // Set a new snack when we don't have an active one
+      setMessageInfo({ ...snackPack[0] });
+      setSnackPack((prev) => prev.slice(1));
+      setOpen(true);
+    } else if (snackPack.length && messageInfo && open) {
+      // Close an active snack when a new one is added
+      setOpen(false);
+    }
+  }, [snackPack, messageInfo, open]);
+  const handleExited = () => {
+    setMessageInfo(undefined);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+
 
   const [loading, setLoading] = useState(false);
   const [creator, setCreator] = useState("");
@@ -33,15 +59,44 @@ const CurrentRankedList = ({ udata }) => {
   const [selectedOption, setSelectedOption] = useState("Me");
   const navigate = useNavigate();
 
-  function handleOnDragEnd(result) {
+  /**
+   * Handles the drag end event
+   * @param {*} result
+   * The result of the drag end event
+   * @returns
+   * null
+   * */
+  const handleOnDragEnd = (result) => {
     if (!result.destination) return;
 
+    // indexed by 1
     const items = Array.from(myRankedList);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
-    setMyRankedList(items);
-  }
+    const updatedItems = items.map((item, index) => [item[0], index + 1]);
+    // console.log("New My Opnions: ", objectFromEntries(updatedItems));
+    // turn into json object
+    const myOpinion1 = Object.fromEntries(updatedItems);
+    console.log("New: " , myOpinion1);
+    putMyOpinion(updatedItems);
+    setMyRankedList(updatedItems);
+  };
 
+  /**
+   * put myOpinon to the backend
+   */
+  const putMyOpinion = async ( dndOpinion ) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5555/room${roomId}/opinion`,
+        { opinion: dndOpinion },
+        { withCredentials: true }
+      );
+      console.log("Opinion updated");
+    } catch (error) {
+      console.error("Error updating opinion:", error);
+    }
+  };
   /**
    * Fetches room data
    */
@@ -55,13 +110,13 @@ const CurrentRankedList = ({ udata }) => {
       setCreator(response.data.room.creator);
 
       const avgOpinion = response.data.room.avgOpinion;
-      console.log(avgOpinion);
       setOpinions(Object.entries(avgOpinion));
       const id = response.data.userId;
       // could be more efficient, should always have a opinion as the call creates a default opinion
       for (let i = 0; i < response.data.room.opinions.length; i++) {
         if (response.data.room.opinions[i].userId === id) {
           const myOpinion = response.data.room.opinions[i].opinions;
+          console.log("original myOpinion: ", myOpinion );
           setMyRankedList(Object.entries(myOpinion));
           break;
         }
@@ -92,7 +147,18 @@ const CurrentRankedList = ({ udata }) => {
       console.log(typeof navigate());
       fetchRoomData();
       setItem("");
+      // notify the user that the item has been added
+      const message = "Item added to list";
+      setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
     } catch (error) {
+      if (item.includes(".")) {
+        setItem(""); 
+        const message = "Cannot have periods in item names";
+        setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
+        return;
+      }
+      const message = "Duplicate item or error adding item to list";
+      setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
       console.log("Error adding item to list", error);
     }
   };
@@ -116,7 +182,11 @@ const CurrentRankedList = ({ udata }) => {
       );
       fetchRoomData();
       setItem("");
+      const message = "Item deleted from list";
+      setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
     } catch (error) {
+      const message = "Error deleting item from list";
+      setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
       console.log("Error deleting item from list", error);
     }
   };
@@ -130,6 +200,7 @@ const CurrentRankedList = ({ udata }) => {
    * */
   const handleSwitchChange = (option) => {
     setSelectedOption(option);
+    fetchRoomData();
     console.log("Switched to", option);
   };
 
@@ -140,47 +211,49 @@ const CurrentRankedList = ({ udata }) => {
   return (
     <div>
       <div className="flex justify-center mt-6 mb-4">
+  
         <Switch onSwitchChange={handleSwitchChange} />
+        <Snackbar
+        key={messageInfo ? messageInfo.key : undefined}
+        open={open}
+        autoHideDuration={5000}
+        onClose={handleClose}
+        TransitionProps={{ onExited: handleExited }}
+        message={messageInfo ? messageInfo.message : undefined}
+      />
       </div>
-      {loading ? (
-        <h1 className="flex justify-center text-xs">Loading...</h1>
+      {/* {loading ? (
+        
+        // <h1 className="flex justify-center h-4">Loading...</h1>
       ) : (
         <h1 className="flex justify-center h-4"></h1>
-      )}
+      )} */}
       {/* <h1>{selectedOption}</h1> */}
       {selectedOption === "Me" && (
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Droppable droppableId="droppable">
             {(provided) => (
-              <div
-                className="flex justify-center mb-6 "
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-              >
-                <ul className="max-h-[600px] max-w-[800px] h-[600px] overflow-y-scroll">
-                  {myRankedList
-                    .sort((a, b) => a[1] - b[1])
-                    .map(([key, value], index) => (
-                      <Draggable
-                        key={`${key}-${index}`}
-                        draggableId={key}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <li
-                            className="border border-black border-solid rounded-xl mb-2 mx-2 text-l p-3 bg-white"
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <strong>{value}</strong>: {key}
-                          </li>
-                        )}
-                      </Draggable>
-                    ))}
-                  {provided.placeholder}
-                </ul>
+              <div className="flex justify-center mb-6" ref={provided.innerRef} {...provided.droppableProps}>
+              <div className="max-h-[600px] max-w-[800px] h-[600px] overflow-auto select-none">
+                {myRankedList
+                  .sort((a, b) => a[1] - b[1])
+                  .map(([key, value], index) => (
+                    <Draggable key={`${key}-${index}`} draggableId={key} index={index}>
+                      {(provided) => (
+                        <div
+                          className="text-2xl p-4 border border-black border-solid rounded-2xl mb-3 mx-3 break-words bg-white"
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <strong>{value}</strong>: {key}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                {provided.placeholder}
               </div>
+            </div>
             )}
           </Droppable>
         </DragDropContext>
@@ -188,20 +261,21 @@ const CurrentRankedList = ({ udata }) => {
 
       {selectedOption !== "Me" && (
         <div className="flex justify-center mb-6 ">
-          <ul className="max-h-[600px] max-w-[500px] overflow-y-scroll">
+          <ul className="max-h-[600px] h-[600px] max-w-[500px] overflow-y-auto">
             {opinions
               .sort((a, b) => a[1] - b[1]) // Sort the array by value
-              .map(([key, value]) => (
+              .map(([key, value], index) => (
                 <li
                   key={key}
-                  className="text-3xl p-4 border border-black border-solid rounded-3xl mb-3 mx-3 break-words "
+                  className="text-2xl p-4 border border-black border-solid rounded-2xl mb-3 mx-3 break-words "
                 >
-                  <strong>{value}</strong>: {key}
+                  <strong>{index+1}</strong>: {key}
                 </li>
               ))}
           </ul>
         </div>
       )}
+      
       {(creator === user || udata.username === "admin") && (
         <div className="w-64 mx-auto border border-black border-solid rounded p-3">
           <form className="flex flex-col gap-4" onSubmit={handleAddition}>

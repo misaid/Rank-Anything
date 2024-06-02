@@ -1,18 +1,10 @@
+0) Lock down all routes and use middleware to ensure important actions cannot be done without logging in.✅
 1) We have to make it so that you are able to switch between opinion list and your list. ✅
-    1.1) We have to add ranking to current ranked list component.
+    1.1) We have to add ranking to current ranked list component.✅
     1.2) We have to be able to append to the default empty list and remove from it. Cap it within view?✅
 2) We have to add room creation and room joining.✅
 3) Adding the possiblity to view other peoples list if the user wants too. (on user's hover small window).
-4) Whitelist.
-5) text for when room dne/exists. text for item dne/exists.
-
-* bugs
-1) on first login rooms and user is empty. (may be fixed if we move post to components).
-
-* extras/ optimizations
-0) Lock down all routes and use middleware to ensure important actions cannot be done without logging in.
-1) rooms are called by name would be faster with id.
-2) redundant calls.
-3) opinions is a list of dicts if possible should be a dicts of dicts.
-4) make loading text spining wheels.
-5) Cannot send text with periods 😂😂
+4) text for when room dne/exists. text for item dne/exists.✅
+5) Should scroll the list up on drag.
+6) testing.
+7) ui changes.

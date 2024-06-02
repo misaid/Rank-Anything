@@ -12,13 +12,13 @@ const YourRooms = ({ roomList }) => {
   }
   return (
     // add a border
-      <div className="border border-solid border-black rounded max-w-64">
+      <div className="border border-solid border-black rounded max-w-64 select-none">
         <div className="flex justify-center border-b border-solid border-black">
           <h2 className="font-bold">
             Your Rooms
             </h2>
           </div>
-        <div className="border-t-2 border-black border-solid max-h-64 overflow-y-scroll">
+        <div className="border-t-2 border-black border-solid max-h-64 overflow-y-auto">
           {roomList.map((room, index) => (
             <li onClick={handleClick} key={index} className="hover:bg-slate-200  cursor-pointer list-none">
               <ol className="text-xl px-4 max-q-64 break-words overflow-hidden">{room}</ol>

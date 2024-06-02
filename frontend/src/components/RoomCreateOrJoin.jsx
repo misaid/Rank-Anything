@@ -1,12 +1,38 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Snackbar from '@mui/material/Snackbar';
+
 
 const RoomCreateOrJoin = () => {
   const [roomId, setRoomId] = useState("");
   const [croomId, setCRoomId] = useState("");
   const navigate = useNavigate();
+
+
+  // code from https://material-ui.com/components/snackbars/
+  const [snackPack, setSnackPack] = React.useState([]);
+  const [messageInfo, setMessageInfo] = React.useState(undefined);
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (snackPack.length && !messageInfo) {
+      // Set a new snack when we don't have an active one
+      setMessageInfo({ ...snackPack[0] });
+      setSnackPack((prev) => prev.slice(1));
+      setOpen(true);
+    } else if (snackPack.length && messageInfo && open) {
+      // Close an active snack when a new one is added
+      setOpen(false);
+    }
+  }, [snackPack, messageInfo, open]);
+  const handleExited = () => {
+    setMessageInfo(undefined);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const handleCreateRoom = async (event) => {
     event.preventDefault();
     if (!croomId) {
@@ -31,6 +57,8 @@ const RoomCreateOrJoin = () => {
       setRoomId("");
       setCRoomId("");
     } catch (error) {
+      const message = "Room already exists";  
+      setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
       console.log("Room creation failed");
     }
   };
@@ -54,11 +82,21 @@ const RoomCreateOrJoin = () => {
       setCRoomId("");
       setRoomId("");
     } catch (error) {
+      const message = "Room does not exist";  
+      setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
       console.log("Room join failed");
     }
   };
   return (
     <div className="w-full border border-black rounded-xl">
+      <Snackbar
+        key={messageInfo ? messageInfo.key : undefined}
+        open={open}
+        autoHideDuration={5000}
+        onClose={handleClose}
+        TransitionProps={{ onExited: handleExited }}
+        message={messageInfo ? messageInfo.message : undefined}
+      />
       <h2 className="m-2 text-base">Join Room</h2>
       <form className="m-2 flex flex-col " onSubmit={handleJoinRoom}>
         <div className="flex items-center mb-1 ">

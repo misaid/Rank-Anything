@@ -162,7 +162,7 @@ const Home = () => {
         <div>
           {authenticated ? (
             <div>
-              <div className="flex text-xl  bg-slate-300 border-b border-solid border-black">
+              <div className="flex text-xl  bg-slate-300 border-b border-solid border-black select-none">
                 <div className="border p-5 border-black border-solid">
                   <p>Welcome, {userData.username}</p>
                 </div>
