@@ -6,7 +6,9 @@ import { redirect, useNavigate, useParams } from "react-router-dom";
 import YourRooms from "./components/YourRooms";
 import RoomCreateOrJoin from "./components/RoomCreateOrJoin";
 import "./index.css";
-
+// Images
+import rankingImage from './assets/ranking.png';
+import logoutImage from './assets/logout.png';
 /**
  * Home component
  * @returns Home component
@@ -161,19 +163,19 @@ const Home = () => {
         <div>
           {authenticated ? (
             <div>
-              <div className="flex text-xl  bg-slate-300 border-b border-solid border-black select-none">
-                <div className="border p-5 border-black border-solid">
+              <div className="flex text-xl  bg-slate-300 border-b border-solid border-black select-none  h-[80px]">
+                <div className="border p-6 border-black border-solid">
                   <p>Welcome, {userData.username}</p>
                 </div>
-                <div className="p-5 justify-center flex flex-1 border border-black border-solid space-x-10">
+                <div className="p-5 justify-center flex flex-1 text-3xl border border-black border-solid space-x-10">
                   <h1>Rank Anything </h1>
-                  <img src="assets/ranking.png" alt="Rank Anything" />
+                  <img src={rankingImage} alt="Rank Anything" />
                 </div>
                 <div
-                  className="p-5  flex border border-black border-solid cursor-pointer"
+                  className="p-6  flex border border-black border-solid cursor-pointer"
                   onClick={logout}
                 >
-                  <p>Logout, </p> <img src="assets\logout.png" alt="Logout" />
+                  <p>Logout, </p> <img src={logoutImage} className = " ml-4 h-6"alt="Logout" />
                 </div>
               </div>
               {/* <div className="">
