@@ -2,6 +2,6 @@
 .env
 /backend/node_modules
 /backend/package-lock.json
-/fronted/package-lock.json
+/frontend/package-lock.json
 /frontend/node_modules
 .vscode
