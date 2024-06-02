@@ -7,7 +7,7 @@ import jsonwebtoken, { decode} from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 // Middleware
-import verifyJWT from "/var/www/html/Rank-Anything/backend/middleware/verifyJWT.js";
+import verifyJWT from "./middleware/verifyJWT.js";
 // Models
 import User from "./models/user.js";
 // import List from "./models/rankedList.js";
@@ -22,7 +22,7 @@ const secretKey = process.env.secretKey;
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
+//app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 app.set("trust proxy", 1);
 app.use(
