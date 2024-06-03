@@ -6,11 +6,11 @@ import bcrypt from "bcrypt";
 import jsonwebtoken, { decode} from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
-// Middleware
+
+// Middleware for verifying JWWT
 import verifyJWT from "./middleware/verifyJWT.js";
 // Models
 import User from "./models/user.js";
-// import List from "./models/rankedList.js";
 import SafeUser from "./models/safeUser.js";
 import Room from "./models/room.js";
 
@@ -22,18 +22,18 @@ const secretKey = process.env.secretKey;
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-//app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
 
 app.set("trust proxy", 1);
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://localhost:5555"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
   })
 );
-
+// app.use(cors())
 app.get("/", (request, response) => {
   console.log(request);
   return response.status(234).send("MSAID");
