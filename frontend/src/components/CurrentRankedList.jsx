@@ -243,7 +243,7 @@ const CurrentRankedList = ({ udata }) => {
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Droppable droppableId="droppable">
             {(provided) => (
-              <div className="flex justify-center mb-6" ref={provided.innerRef} {...provided.droppableProps}>
+              <div className="flex justify-center md:mb-6 mb-3" ref={provided.innerRef} {...provided.droppableProps}>
               <div className="max-h-[600px] max-w-[800px] h-[600px] overflow-auto select-none">
                 {myRankedList
                   .sort((a, b) => a[1] - b[1])
@@ -270,7 +270,7 @@ const CurrentRankedList = ({ udata }) => {
       )}
 
       {selectedOption !== "Me" && (
-        <div className="flex justify-center mb-6 ">
+        <div className="flex justify-center md:mb-6 mb-2 ">
           <ul className="max-h-[600px] h-[600px] max-w-[500px] overflow-y-auto">
             {opinions
               .sort((a, b) => a[1] - b[1]) // Sort the array by value

@@ -62,10 +62,9 @@ const Home = () => {
       return;
     }
     try {
-      const response = await axiosInstance.get(
-        `/user${userId}/rooms`,
-        { withCredentials: true }
-      );
+      const response = await axiosInstance.get(`/user${userId}/rooms`, {
+        withCredentials: true,
+      });
       setRooms(response.data);
     } catch (error) {
       console.error("Error getting rooms from user:", error);
@@ -83,10 +82,9 @@ const Home = () => {
       return;
     }
     try {
-      const roomCheckResponse = await axiosInstance.get(
-        `/room${roomId}`,
-        { withCredentials: true }
-      );
+      const roomCheckResponse = await axiosInstance.get(`/room${roomId}`, {
+        withCredentials: true,
+      });
       if (!roomCheckResponse.data.room) {
         console.error("Room does not exist");
         return;
@@ -170,38 +168,44 @@ const Home = () => {
         <div>
           {authenticated ? (
             <div>
-              <div className="flex text-xl  bg-slate-300 border-b border-solid border-black select-none  h-[80px]">
-                <div className="border p-6 border-black border-solid">
+              <div className="flex md:text-xl text-sm bg-slate-300 border-b border-solid border-black select-none md:h-20 items-center">
+                <div className="h-full p-3 md:p-6  break-words flex items-center">
                   <p>Welcome, {userData.username}</p>
                 </div>
-                <div className="p-5 justify-center flex flex-1 text-3xl border border-black border-solid space-x-10">
+                <div className="h-full p-6 md:space-x-10 space-x-5 md:text-3xl text-base justify-center items-center flex flex-1 border-x border-black border-solid">
                   <h1>Rank Anything </h1>
-                  <img src={rankingImage} alt="Rank Anything" />
+                  <img
+                    src={rankingImage}
+                    className="md:h-10 h-5"
+                    alt="Rank Anything"
+                  />
                 </div>
                 <div
-                  className="p-6  flex border border-black border-solid cursor-pointer"
+                  className="p-6 flex border-r cursor-pointer items-center"
                   onClick={logout}
                 >
-                  <p>Logout, </p>{" "}
-                  <img src={logoutImage} className=" ml-4 h-6" alt="Logout" />
+                  <p>Logout, </p>
+                  <img
+                    src={logoutImage}
+                    className="ml-4 md:h-6 h-3"
+                    alt="Logout"
+                  />
                 </div>
               </div>
-              {/* <div className="">
-                <p>Your user ID is {userData.userId}.</p>
-              </div> */}
+
               <div className="flex flex-wrap w-full ">
-                <div className=" flex-1 mx-10 mt-60">
+                <div className="hidden md:block flex-1 md:mx-10 md:mt-60 mx-5 mt-10">
                   <div className="w-80">
                     <RoomCreateOrJoin />
                   </div>
-                  <div className="mt-32">
+                  <div className="flex md:flex-none md:mt-32 mt-10 md:justify-start justify-center">
                     <YourRooms roomList={rooms} />
                   </div>
                 </div>
                 <div className="flex-grow ">
                   <div className="flex justify-center mt-6">
                     {/* rounded bg-black hover:bg-white hover:rounded-none */}
-                    <h1 className="text-5xl ">
+                    <h1 className="md:text-5xl text-2xl ">
                       Ranking:{" "}
                       <span className="border-b-2 border-solid border-black ">
                         {" "}
@@ -213,7 +217,17 @@ const Home = () => {
                     <CurrentRankedList udata={userData} />
                   </div>
                 </div>
-                <div className="flex-1 m-5 mt-60 ">
+                <div className="block md:hidden flex-1 md:mx-10 md:mt-60 mx-3 w-full justify-center mt-10">
+                  <div className="w-80 mb-10 flex flex-col justify-center items-center">
+                    < div className="ml-12">
+                      <RoomCreateOrJoin />
+                    </div>
+                    <div className="ml-12 mt-10">
+                      <YourRooms roomList={rooms} />
+                    </div>
+                  </div>
+                </div>
+                <div className="hidden md:block flex-1 m-5 mt-60 ">
                   <div className="w-80 mx-auto">
                     <AllUsers
                       userList={users}
@@ -231,8 +245,8 @@ const Home = () => {
       ) : (
         <div className="flex justify-center items-center h-screen">
           <div className="flex ">
-          <p> Loading...</p>
-          <CircularProgress />
+            <p> Loading...</p>
+            <CircularProgress />
           </div>
         </div>
       )}
