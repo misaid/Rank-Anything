@@ -18,6 +18,7 @@ import Room from "./models/room.js";
 const PORT = process.env.PORT;
 const mongoDBURL = process.env.mongoDBURL;
 const secretKey = process.env.secretKey;
+const DOMAIN = process.env.domain;
 
 const app = express();
 app.use(express.json());
@@ -85,7 +86,7 @@ app.post("/tempuser", async (request, response) => {
             secure: process.env.node_env === "production",
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             // sameSite: 'lax',
-            domain: "localhost",
+            domain: "."+DOMAIN,
             // path: '/',
           });
           console.log("Safe user created for temp user");
