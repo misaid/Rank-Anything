@@ -258,6 +258,7 @@ const CurrentRankedList = ({ udata }) => {
                             className="flex items-center text-2xl p-4 border border-black border-solid rounded-2xl mb-3 mx-3 break-words bg-white"
                             ref={provided.innerRef}
                             {...provided.draggableProps}
+                            {...provided.dragHandleProps} 
                           >
                             <div className="flex items-center mr-2">
                               <div className="grid grid-cols-2 gap-0.5">
@@ -269,10 +270,7 @@ const CurrentRankedList = ({ udata }) => {
                                 <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
                               </div>
                             </div>
-                            <div
-                              {...provided.dragHandleProps}
-                              className="flex-grow"
-                            >
+                            <div className="flex-grow">
                               <strong>{value}</strong>: {key}
                             </div>
                           </div>
