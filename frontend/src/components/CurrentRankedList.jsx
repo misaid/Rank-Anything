@@ -255,7 +255,7 @@ const CurrentRankedList = ({ udata }) => {
                       >
                         {(provided) => (
                           <div
-                            className="flex items-center text-2xl p-4 border border-black border-solid rounded-2xl mb-3 mx-3 break-words bg-white"
+                            className="flex items-center text-2xl p-4 border border-black border-solid rounded-2xl mb-3 mx-3 break-all bg-white"
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps} 
