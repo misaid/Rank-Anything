@@ -28,7 +28,7 @@ app.use(cookieParser());
 app.set("trust proxy", 1);
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5555"],
+    origin: ["http://localhost:5173", "https://rank.msaid.dev","http://localhost:5555"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
@@ -46,6 +46,7 @@ app.get("/", (request, response) => {
  */
 app.post("/verifyjwt", async (request, response) => {
   const { jwt: token } = request.cookies;
+  console.log("*******************************************\nverify: ", request.cookies)
   try {
     // Token is valid
     const decoded = jsonwebtoken.verify(token, secretKey);
@@ -83,11 +84,12 @@ app.post("/tempuser", async (request, response) => {
             );
             response.cookie("jwt", token, {
               httpOnly: true,
+              //secure: true,
               secure: process.env.node_env === "production",
               maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-              // sameSite: 'lax',
-              domain: "." + DOMAIN,
-              // path: '/',
+              sameSite: 'none',
+              // domain: "." + DOMAIN,
+              path: '/',
             });
             console.log("Safe user created for temp user");
             console.log("Cookie created for temp user", token)
@@ -144,9 +146,9 @@ app.post("/login", async (request, response) => {
         httpOnly: true,
         secure: process.env.node_env === "production",
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-        // sameSite: 'lax',
-        domain: "." + DOMAIN,
-        // path: '/',
+        sameSite: 'none',
+        //domain: "." + DOMAIN,
+        path: '/',
       });
 
       console.log("Cookie created");

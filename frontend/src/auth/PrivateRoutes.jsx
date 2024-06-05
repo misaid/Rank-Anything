@@ -13,11 +13,13 @@ import axios from 'axios';
  */
 const PrivateRoutes = () => {
   const [auth, setAuth] = useState(null);
-
+  const axiosInstance = axios.create({
+    baseURL: import.meta.env.VITE_APP_API_URL,
+  });
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const response = await axios.post('http://localhost:5555/verifyjwt', {}, {
+        const response = await axiosInstance.post('/verifyjwt', {}, {
           withCredentials: true,
         });
         setAuth(response.data.valid);
