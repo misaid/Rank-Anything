@@ -12,7 +12,7 @@ Rank Anything is a personal project developed using the MERN stack (MongoDB, Exp
 ### Security:
 * User Passwords encrypted with bcrypt and a salt. User authentication is done through JSON web tokens.
 ## Technologies Used
-* **Frontend:** React.js
+* **Frontend:** React.js, Tailwind CSS
 * **Backend:** Node.js, Express.js
 * **Database:** MongoDB
 ## Demo
