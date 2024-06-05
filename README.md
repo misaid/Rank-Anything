@@ -16,7 +16,6 @@ Rank Anything is a personal project developed using the MERN stack (MongoDB, Exp
 * **Backend:** Node.js, Express.js
 * **Database:** MongoDB
 ## Demo
-
-
+![Rank-Anything demo Video](demo/demo.gif)
 ## License
 This project is licensed under the MIT License.
