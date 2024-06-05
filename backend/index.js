@@ -84,11 +84,9 @@ app.post("/tempuser", async (request, response) => {
             );
             response.cookie("jwt", token, {
               httpOnly: true,
-              //secure: true,
-              secure: process.env.node_env === "production",
+              secure: true,
+              //secure: process.env.node_env === "production",
               maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-              sameSite: 'none',
-              // domain: "." + DOMAIN,
               path: '/',
             });
             console.log("Safe user created for temp user");
@@ -144,9 +142,10 @@ app.post("/login", async (request, response) => {
 
       response.cookie("jwt", token, {
         httpOnly: true,
-        secure: process.env.node_env === "production",
+        secure: true,
+        //secure: process.env.node_env === "production",
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-        sameSite: 'none',
+        //sameSite: 'none',
         //domain: "." + DOMAIN,
         path: '/',
       });

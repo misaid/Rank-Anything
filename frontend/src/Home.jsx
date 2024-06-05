@@ -244,9 +244,9 @@ const Home = () => {
         </div>
       ) : (
         <div className="flex justify-center items-center h-screen">
-          <div className="flex ">
-            <p> Loading...</p>
+          <div className="flex-row justify-center items-center">
             <CircularProgress />
+            <p>Loading</p>
           </div>
         </div>
       )}

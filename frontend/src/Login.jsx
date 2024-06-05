@@ -8,9 +8,13 @@ function Login() {
   const [password, setPassword] = useState();
   const [invalid, setInvalid] = useState(false);
   const navigate = useNavigate();
+
+  const axiosInstance = axios.create({
+    baseURL: import.meta.env.VITE_APP_API_URL,
+  }); 
   const handleTempUser = async (event) => {
     try {
-      await axios.post('http://localhost:5555/tempuser',{}, {withCredentials: true});
+      await axiosInstance.post('/tempuser',{}, {withCredentials: true});
       navigate('/')
     }
     catch (error) {
@@ -20,7 +24,7 @@ function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      await axios.post('http://localhost:5555/login',{username, password},
+      await axiosInstance.post('/login',{username, password},
       {
         withCredentials: true
       }

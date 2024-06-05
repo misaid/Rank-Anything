@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Route, Navigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
-
+import { CircularProgress } from "@mui/material";
 
 /**
  * This function is a react component that will verify the jwt token and return the appropriate component
@@ -33,7 +33,7 @@ const PrivateRoutes = () => {
   }, []);
 
   if (auth === null) {
-    return <div>Loading...</div>;
+    return<div className="flex justify-center items-center h-screen"><div className="flex-row justify-center items-center"><CircularProgress /><p>Loading</p></div></div>;
   }
 
   return (
