@@ -40,10 +40,14 @@ const RoomCreateOrJoin = () => {
       return;
     }
     if (croomId.length < 3) {
+      const message = "Room ID must be at least 3 characters";
+      setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
       console.log("Room ID must be at least 3 characters");
       return;
     }
     if (croomId.length > 20) {
+      const message = "Room ID must be at most 20 characters";
+      setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
       console.log("Room ID must be at most 20 characters");
       return;
     }
