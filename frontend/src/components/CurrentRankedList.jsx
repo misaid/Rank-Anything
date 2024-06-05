@@ -244,7 +244,7 @@ const CurrentRankedList = ({ udata }) => {
           <Droppable droppableId="droppable">
             {(provided) => (
               <div className="flex justify-center md:mb-6 mb-3" ref={provided.innerRef} {...provided.droppableProps}>
-              <div className="max-h-[600px] max-w-[800px] h-[600px] overflow-auto select-none">
+              <div className=" max-w-[800px]  select-none">
                 {myRankedList
                   .sort((a, b) => a[1] - b[1])
                   .map(([key, value], index) => (
