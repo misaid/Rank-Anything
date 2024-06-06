@@ -197,6 +197,14 @@ const CurrentRankedList = ({ udata }) => {
     fetchRoomData();
   }, [roomId]);
 
+  // fetches every 5 seconds
+  useEffect(() => {
+    const fetchDataInterval = setInterval(() => {
+        fetchRoomData();
+    }, 5000);
+    return () => clearInterval(fetchDataInterval);
+}, [roomId]);
+
   React.useEffect(() => {
     if (snackPack.length && !messageInfo) {
       // Set a new snack when we don't have an active one

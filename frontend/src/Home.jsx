@@ -161,6 +161,12 @@ const Home = () => {
     console.log("useEffect Started for", roomId);
     fetchData();
   }, [roomId]);
+  useEffect(() => {
+    const fetchDataInterval = setInterval(() => {
+        fetchData();
+    }, 5000);
+    return () => clearInterval(fetchDataInterval);
+}, [roomId]);
 
   return (
     <div>
