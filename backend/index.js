@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import jsonwebtoken, { decode } from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
+import { rateLimit } from "express-rate-limit";
 
 // Middleware for verifying JWWT
 import verifyJWT from "./middleware/verifyJWT.js";
@@ -19,16 +20,24 @@ const PORT = process.env.PORT;
 const mongoDBURL = process.env.mongoDBURL;
 const secretKey = process.env.secretKey;
 const DOMAIN = process.env.domain;
+var limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // max 100 requests per windowMs
+});
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-
+app.use(limiter);
 
 app.set("trust proxy", 1);
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://rank.msaid.dev","http://localhost:5555"],
+    origin: [
+      "http://localhost:5173",
+      "https://rank.msaid.dev",
+      "http://localhost:5555",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
@@ -41,12 +50,15 @@ app.get("/", (request, response) => {
 });
 
 /**
- * Compares the jwt submitted with secretkey to see if it has been tamperred with also gives 
+ * Compares the jwt submitted with secretkey to see if it has been tamperred with also gives
  * information about the user if valid.
  */
 app.post("/verifyjwt", async (request, response) => {
   const { jwt: token } = request.cookies;
-  console.log("*******************************************\nverify: ", request.cookies)
+  console.log(
+    "*******************************************\nverify: ",
+    request.cookies
+  );
   try {
     // Token is valid
     const decoded = jsonwebtoken.verify(token, secretKey);
@@ -66,7 +78,7 @@ app.post("/tempuser", async (request, response) => {
     // Create a temp user
     //username in style of user-<random number>
     const username = "user-" + Math.floor(Math.random() * 1000000);
-    console.log("Creating temp user: ", username)
+    console.log("Creating temp user: ", username);
     const newUser = {
       username: username,
       password: bcrypt.hashSync("password", 10),
@@ -87,10 +99,10 @@ app.post("/tempuser", async (request, response) => {
               secure: true,
               //secure: process.env.node_env === "production",
               maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-              path: '/',
+              path: "/",
             });
             console.log("Safe user created for temp user");
-            console.log("Cookie created for temp user", token)
+            console.log("Cookie created for temp user", token);
             response.status(200).send({ username: username });
           })
           .catch((error) => {
@@ -106,8 +118,7 @@ app.post("/tempuser", async (request, response) => {
     console.log(error.message);
     response.status(500).send({ message: error.message });
   }
-}
-);
+});
 /**
  * User paswords are hashed with bcrypt so we have to compare the hashed password to the user input here.
  */
@@ -147,7 +158,7 @@ app.post("/login", async (request, response) => {
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         //sameSite: 'none',
         //domain: "." + DOMAIN,
-        path: '/',
+        path: "/",
       });
 
       console.log("Cookie created");
@@ -286,7 +297,7 @@ app.post("/room:id/user", verifyJWT, async (request, response) => {
 
 /**
  * Get Rooms from user
-*/
+ */
 app.get("/user:id/rooms", verifyJWT, async (request, response) => {
   // verify user id matches cookie
   const decoded = request.user;
@@ -309,7 +320,6 @@ app.get("/user:id/rooms", verifyJWT, async (request, response) => {
     response.status(500).send({ message: error.message });
   }
 });
-
 
 /**
  * change user opinion in room
@@ -336,12 +346,19 @@ app.put("/room:id/opinion", verifyJWT, async (request, response) => {
           }
 
           // verify that max number is 1 + list.size
-          // verify that all values are positive 
-          const maxNumber = room.defaultRankedList.size + 1
+          // verify that all values are positive
+          const maxNumber = room.defaultRankedList.size + 1;
           let sum = 0;
           for (const [key, value] of userOpinion.entries()) {
             if (value[1] < 0 || value[1] > maxNumber) {
-              console.log("Invalid opinion: ", value[1], " for ", value[0], " in ", userOpinion)
+              console.log(
+                "Invalid opinion: ",
+                value[1],
+                " for ",
+                value[0],
+                " in ",
+                userOpinion
+              );
               response.status(400).send("Invalid opinion");
               return;
             }
@@ -349,10 +366,10 @@ app.put("/room:id/opinion", verifyJWT, async (request, response) => {
           }
 
           // verify that the sum is maxNumber + maxNumber-1 + ... + 1
-          const gsum = (((maxNumber - 1) * (maxNumber)) / 2);
+          const gsum = ((maxNumber - 1) * maxNumber) / 2;
           // console.log("Sum: ", sum, " gsum: ", gsum, "maxNumber: ", maxNumber)
 
-          if (sum !== (gsum)) {
+          if (sum !== gsum) {
             console.log("Invalid sum: ", sum, " for ", userOpinion);
             response.status(400).send("Invalid opinion");
             return;
@@ -501,7 +518,6 @@ app.get("/room:id", verifyJWT, async (request, response) => {
   }
 });
 
-
 /**
  * add item to room
  */
@@ -644,8 +660,6 @@ app.delete("/room:id/item", verifyJWT, async (request, response) => {
     response.status(500).send("Internal Server Error");
   }
 });
-
-
 
 /**
  * Connect to the database and start the server
