@@ -22,7 +22,7 @@ const secretKey = process.env.secretKey;
 const DOMAIN = process.env.domain;
 var limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100, // max 100 requests per windowMs
+  limit: 400, // max 100 requests per windowMs
 });
 
 const app = express();

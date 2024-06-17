@@ -62,7 +62,7 @@ const CurrentRankedList = ({ udata }) => {
     // console.log("New My Opnions: ", objectFromEntries(updatedItems));
     // turn into json object
     const myOpinion1 = Object.fromEntries(updatedItems);
-    console.log("New: ", myOpinion1);
+    //console.log("New: ", myOpinion1);
     putMyOpinion(updatedItems);
     setMyRankedList(updatedItems);
   };
@@ -81,7 +81,7 @@ const CurrentRankedList = ({ udata }) => {
         { opinion: dndOpinion },
         { withCredentials: true }
       );
-      console.log("Opinion updated");
+      //console.log("Opinion updated");
     } catch (error) {
       console.error("Error updating opinion:", error);
     }
@@ -105,7 +105,7 @@ const CurrentRankedList = ({ udata }) => {
       for (let i = 0; i < response.data.room.opinions.length; i++) {
         if (response.data.room.opinions[i].userId === id) {
           const myOpinion = response.data.room.opinions[i].opinions;
-          console.log("original myOpinion: ", myOpinion);
+          //console.log("original myOpinion: ", myOpinion);
           setMyRankedList(Object.entries(myOpinion));
           break;
         }
@@ -133,7 +133,7 @@ const CurrentRankedList = ({ udata }) => {
         { item: item },
         { withCredentials: true }
       );
-      console.log(typeof navigate());
+      //console.log(typeof navigate());
       fetchRoomData();
       setItem("");
       // notify the user that the item has been added
@@ -190,7 +190,7 @@ const CurrentRankedList = ({ udata }) => {
   const handleSwitchChange = (option) => {
     setSelectedOption(option);
     fetchRoomData();
-    console.log("Switched to", option);
+    //console.log("Switched to", option);
   };
 
   useEffect(() => {

@@ -77,7 +77,7 @@ const RoomCreateOrJoin = () => {
     if (!roomId) {
       return;
     }
-    console.log("Joining room", roomId);
+    //console.log("Joining room", roomId);
     try {
       const response = await axiosInstance.get(`/room${roomId}`, {
         withCredentials: true,
