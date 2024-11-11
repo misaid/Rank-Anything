@@ -20,15 +20,15 @@ const PORT = process.env.PORT;
 const mongoDBURL = process.env.mongoDBURL;
 const secretKey = process.env.secretKey;
 const DOMAIN = process.env.domain;
-var limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 400, // max 100 requests per windowMs
-});
+// var limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   limit: 400, // max 100 requests per windowMs
+// });
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(limiter);
+// app.use(limiter);
 
 app.set("trust proxy", 1);
 app.use(
@@ -41,7 +41,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
-  })
+  }),
 );
 // app.use(cors())
 app.get("/", (request, response) => {
@@ -57,7 +57,7 @@ app.post("/verifyjwt", async (request, response) => {
   const { jwt: token } = request.cookies;
   console.log(
     "*******************************************\nverify: ",
-    request.cookies
+    request.cookies,
   );
   try {
     // Token is valid
@@ -92,7 +92,7 @@ app.post("/tempuser", async (request, response) => {
             const token = jsonwebtoken.sign(
               { userId: user._id, username: user.username, authLevel: "user" },
               secretKey,
-              { expiresIn: "30d" }
+              { expiresIn: "30d" },
             );
             response.cookie("jwt", token, {
               httpOnly: true,
@@ -147,7 +147,7 @@ app.post("/login", async (request, response) => {
       const token = jsonwebtoken.sign(
         { userId: user._id, username: user.username, authLevel: "user" },
         secretKey,
-        { expiresIn: "30d" }
+        { expiresIn: "30d" },
       );
       console.log(token);
 
@@ -254,7 +254,7 @@ app.post("/user:id/room", verifyJWT, async (request, response) => {
         SafeUser.findOneAndUpdate(
           { _id: userId },
           { $addToSet: { roomids: roomId } }, // Use $addToSet to ensure uniqueness
-          { new: true, upsert: false }
+          { new: true, upsert: false },
         )
           .then(() => {
             response.status(200).send("Room added to user successfully");
@@ -285,7 +285,7 @@ app.post("/room:id/user", verifyJWT, async (request, response) => {
     const room = await Room.findOneAndUpdate(
       { roomname: request.params.id },
       { $addToSet: { users: request.body.username } }, // Use $addToSet to ensure uniqueness
-      { new: true, upsert: false }
+      { new: true, upsert: false },
     );
 
     response.status(200).send("User added to room successfully");
@@ -357,7 +357,7 @@ app.put("/room:id/opinion", verifyJWT, async (request, response) => {
                 " for ",
                 value[0],
                 " in ",
-                userOpinion
+                userOpinion,
               );
               response.status(400).send("Invalid opinion");
               return;
@@ -475,7 +475,7 @@ app.get("/room:id", verifyJWT, async (request, response) => {
         // console.log(request.params.id, room);
         // if user is not in opinions, add them and set them to default ranked list
         const userOpinion = room.opinions.find(
-          (opinion) => opinion.userId === decoded.userId
+          (opinion) => opinion.userId === decoded.userId,
         );
         if (!userOpinion) {
           // If the user's opinion doesn't exist, add it with the default ranked list
