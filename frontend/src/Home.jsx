@@ -10,8 +10,7 @@ import YourRooms from "./components/YourRooms";
 import RoomCreateOrJoin from "./components/RoomCreateOrJoin";
 import "./index.css";
 // Images
-import rankingImage from "./assets/ranking.png";
-import logoutImage from "./assets/logout.png";
+import Navbar from "./components/Navbar";
 
 /**
  * Home component
@@ -31,25 +30,6 @@ const Home = () => {
   const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_APP_API_URL,
   });
-  /**
-   * This function logs out the user
-   * @returns null
-   * */
-  const logout = async () => {
-    try {
-      const response = await axiosInstance.post(
-        "/logout",
-        {},
-        { withCredentials: true }
-      );
-
-      setAuthenticated(false);
-      setUserData(null);
-      navigate("/login");
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
 
   /**
    * This function obtains all the users rooms
@@ -94,7 +74,7 @@ const Home = () => {
         {
           roomId: roomId,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       // console.log(roomCheckResponse.data)
       setUsers(roomCheckResponse.data.room.users);
@@ -120,7 +100,7 @@ const Home = () => {
         {
           username: username,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       //console.log(response.data);
     } catch (error) {
@@ -137,7 +117,7 @@ const Home = () => {
         {},
         {
           withCredentials: true,
-        }
+        },
       );
 
       // If code 200 that means verification successful
@@ -163,10 +143,10 @@ const Home = () => {
   }, [roomId]);
   useEffect(() => {
     const fetchDataInterval = setInterval(() => {
-        fetchData();
+      fetchData();
     }, 5000);
     return () => clearInterval(fetchDataInterval);
-}, [roomId]);
+  }, [roomId]);
 
   return (
     <div>
@@ -174,31 +154,11 @@ const Home = () => {
         <div>
           {authenticated ? (
             <div>
-              <div className="flex md:text-xl text-sm bg-slate-300 border-b border-solid border-black select-none md:h-20 items-center">
-                <div className="h-full p-3 md:p-6  break-words flex items-center">
-                  <p>Welcome, {userData.username}</p>
-                </div>
-                <div className="h-full p-6 md:space-x-10 space-x-5 md:text-3xl text-base justify-center items-center flex flex-1 border-x border-black border-solid">
-                  <h1>Rank Anything </h1>
-                  <img
-                    src={rankingImage}
-                    className="md:h-10 h-5"
-                    alt="Rank Anything"
-                  />
-                </div>
-                <div
-                  className="p-6 flex border-r cursor-pointer items-center"
-                  onClick={logout}
-                >
-                  <p>Logout, </p>
-                  <img
-                    src={logoutImage}
-                    className="ml-4 md:h-6 h-3"
-                    alt="Logout"
-                  />
-                </div>
-              </div>
-
+              <Navbar
+                userData={userData}
+                setAuthenticated={setAuthenticated}
+                setUserData={setUserData}
+              />
               <div className="flex flex-wrap w-full ">
                 <div className="hidden md:block flex-1 md:mx-10 md:mt-60 mx-5 mt-10">
                   <div className="w-80">
@@ -225,7 +185,7 @@ const Home = () => {
                 </div>
                 <div className="block md:hidden flex-1 md:mx-10 md:mt-60 mx-3 w-full justify-center mt-10">
                   <div className="w-80 mb-10 flex flex-col justify-center items-center">
-                    < div className="ml-12">
+                    <div className="ml-12">
                       <RoomCreateOrJoin />
                     </div>
                     <div className="ml-12 mt-10">
@@ -250,7 +210,7 @@ const Home = () => {
         </div>
       ) : (
         <div className="flex justify-center items-center h-screen">
-          <div className="flex-row justify-center items-center">
+          <div className="flex flex-col justify-center items-center space-y-2">
             <CircularProgress />
             <p>Loading</p>
           </div>
