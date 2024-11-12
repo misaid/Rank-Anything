@@ -45,7 +45,7 @@ const Navbar = ({ userData, setAuthenticated, setUserData }) => {
   };
   return (
     <div className="flex flex-row border border-b items-center justify-between py-4 px-8">
-      <div className="h-full justify-center items-center flex md:space-x-10 space-x-5 md:text-3xl text-base">
+      <div className="h-full justify-center items-center flex md:space-x-4 space-x-2 md:text-3xl text-base">
         <img src={rankingImage} className="md:h-10 h-5" alt="Rank Anything" />
         <h1>Rank Anything </h1>
       </div>
