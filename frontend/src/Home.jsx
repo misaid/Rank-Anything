@@ -183,16 +183,6 @@ const Home = () => {
                     <CurrentRankedList udata={userData} />
                   </div>
                 </div>
-                <div className="block md:hidden flex-1 md:mx-10 md:mt-60 mx-3 w-full justify-center mt-10">
-                  <div className="w-80 mb-10 flex flex-col justify-center items-center">
-                    <div className="ml-12">
-                      <RoomCreateOrJoin />
-                    </div>
-                    <div className="ml-12 mt-10">
-                      <YourRooms roomList={rooms} />
-                    </div>
-                  </div>
-                </div>
                 <div className="max-w-80 w-full hidden md:block flex-1 md:mx-10 md:mt-60 mx-5 mt-10">
                   <AllUsers
                     userList={users}

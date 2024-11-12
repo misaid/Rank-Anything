@@ -78,8 +78,8 @@ const NavigatePage = () => {
                 setAuthenticated={setAuthenticated}
                 setUserData={setUserData}
               />
-              <div className="w-screen h-screen flex items-center justify-center">
-                <div className="w-[400px] h-[400px] flex flex-col items-center justify-center space-y-8">
+              <div className="w-screen mt-48 sm:mt-56 flex items-center justify-center">
+                <div className="max-w-[350px] max-h-[350px] flex flex-col items-center justify-center space-y-8">
                   <RoomCreateOrJoin />
 
                   {rooms && rooms.length > 0 && <YourRooms roomList={rooms} />}
