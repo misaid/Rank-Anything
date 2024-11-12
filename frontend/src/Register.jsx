@@ -117,12 +117,12 @@ function Register() {
             <label htmlFor="password" className="mr-2">
               <strong>Password</strong>
             </label>
-            <input
+            <Input
               type="password"
               placeholder="Enter password"
               autoComplete="off"
               name="password2"
-              className="w-full px-3 py-2 border border-gray-300 rounded"
+              className="w-full p-3 text-base"
               onChange={(e) => setPassword1(e.target.value)}
             />
           </div>{" "}
