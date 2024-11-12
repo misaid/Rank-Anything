@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Validation from "./Validation";
 import Snackbar from "@mui/material/Snackbar";
+import { Input } from "@/components/ui/input";
 
 /**
  * This is the register component that will allow the user to register
@@ -72,7 +73,7 @@ function Register() {
     }
   };
   return (
-    <div className="flex justify-center items-center h-screen bg-slate-400">
+    <div className="flex justify-center items-center h-screen">
       <Snackbar
         key={messageInfo ? messageInfo.key : undefined}
         open={open}
@@ -81,19 +82,19 @@ function Register() {
         TransitionProps={{ onExited: handleExited }}
         message={messageInfo ? messageInfo.message : undefined}
       />
-      <div className="bg-white p-3 rounded w-25">
+      <div className="bg-white p-4 border rounded-xl shadow-md w-25">
         <h2 className="mb-2 text-2xl">Register</h2>
         <form className="flex flex-col gap-4" onSubmit={handleValidation}>
           <div className="flex items-center mb-1 ">
             <label htmlFor="email" className="mr-2">
               <strong>Username</strong>
             </label>
-            <input
+            <Input
               type="text"
               placeholder="Enter username"
               autoComplete="off"
               name="email"
-              className="w-full px-3 py-2 border border-gray-300 rounded"
+              className="w-full p-3 text-base"
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
@@ -102,12 +103,12 @@ function Register() {
             <label htmlFor="password" className="mr-2">
               <strong>Password</strong>
             </label>
-            <input
+            <Input
               type="password"
               placeholder="Enter password"
               autoComplete="off"
               name="password"
-              className="w-full px-3 py-2 border border-gray-300 rounded"
+              className="w-full p-3 text-base"
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
