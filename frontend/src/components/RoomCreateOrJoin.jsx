@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Snackbar from "@mui/material/Snackbar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const RoomCreateOrJoin = () => {
   const [roomId, setRoomId] = useState("");
@@ -57,7 +59,7 @@ const RoomCreateOrJoin = () => {
         {},
         {
           withCredentials: true,
-        }
+        },
       );
       navigate(`/list/${croomId}`);
       setRoomId("");
@@ -111,7 +113,7 @@ const RoomCreateOrJoin = () => {
   }, [snackPack, messageInfo, open]);
 
   return (
-    <div className="w-full border border-black rounded-xl">
+    <div className="w-full border shadow-md rounded-xl p-4">
       <Snackbar
         key={messageInfo ? messageInfo.key : undefined}
         open={open}
@@ -126,21 +128,18 @@ const RoomCreateOrJoin = () => {
           {/* <label htmlFor="email" className="mr-2">
             <strong>Room ID</strong>
           </label> */}
-          <input
+          <Input
             type="text"
             placeholder="Enter Room ID"
             autoComplete="off"
-            name="email"
-            className="w-4/6 px-3 py-2 border-b text-sm border-gray-400  mr-2"
+            name="text"
+            className="w-4/6 px-3 py-2 border-b text-base border-gray-400  mr-2"
             value={roomId}
             onChange={(e) => setRoomId(e.target.value)}
           />
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-2 rounded"
-          >
-            Join Room
-          </button>
+          <Button type="submit" className="bg-blue-500 hover:bg-blue-700">
+            Join
+          </Button>
         </div>
       </form>
       <h2 className="m-2 text-base">Create Room</h2>
@@ -149,21 +148,18 @@ const RoomCreateOrJoin = () => {
           {/* <label htmlFor="email" className="mr-2">
             <strong>Room ID</strong>
           </label> */}
-          <input
+          <Input
             type="text"
             placeholder="Enter Room ID"
             autoComplete="off"
-            name="email"
-            className="w-4/6 px-3 py-2 mr-2 border-b text-sm border-gray-400 "
+            name="text"
+            className="w-4/6 px-3 py-2 mr-2 border-b text-base border-gray-400 "
             value={croomId}
             onChange={(e) => setCRoomId(e.target.value)}
           />
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-2 rounded"
-          >
-            Create Room
-          </button>
+          <Button type="submit" className="bg-blue-500 hover:bg-blue-700">
+            Create
+          </Button>
         </div>
       </form>
     </div>

@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import Snackbar from "@mui/material/Snackbar";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 /**
  * This function is the current ranked list component
@@ -79,7 +81,7 @@ const CurrentRankedList = ({ udata }) => {
       const response = await axiosInstance.put(
         `/room${roomId}/opinion`,
         { opinion: dndOpinion },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       //console.log("Opinion updated");
     } catch (error) {
@@ -131,7 +133,7 @@ const CurrentRankedList = ({ udata }) => {
       const response = await axiosInstance.put(
         `/room${roomId}/item`,
         { item: item },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       //console.log(typeof navigate());
       fetchRoomData();
@@ -200,10 +202,10 @@ const CurrentRankedList = ({ udata }) => {
   // fetches every 5 seconds
   useEffect(() => {
     const fetchDataInterval = setInterval(() => {
-        fetchRoomData();
+      fetchRoomData();
     }, 5000);
     return () => clearInterval(fetchDataInterval);
-}, [roomId]);
+  }, [roomId]);
 
   React.useEffect(() => {
     if (snackPack.length && !messageInfo) {
@@ -263,10 +265,10 @@ const CurrentRankedList = ({ udata }) => {
                       >
                         {(provided) => (
                           <div
-                            className="flex items-center text-2xl p-4 border border-black border-solid rounded-2xl mb-3 mx-3 break-all bg-white"
+                            className="flex items-center text-2xl p-4 border border-black border-solid rounded-2xl shadow-md mb-3 mx-3 break-all bg-white"
                             ref={provided.innerRef}
                             {...provided.draggableProps}
-                            {...provided.dragHandleProps} 
+                            {...provided.dragHandleProps}
                           >
                             <div className="flex items-center mr-2">
                               <div className="grid grid-cols-2 gap-0.5">
@@ -301,7 +303,7 @@ const CurrentRankedList = ({ udata }) => {
               .map(([key, value], index) => (
                 <li
                   key={key}
-                  className="text-2xl p-4 border border-black border-solid rounded-2xl mb-3 mx-3 break-words "
+                  className="text-2xl p-4 border border-black border-solid rounded-2xl shadow-md mb-3 mx-3 break-words "
                 >
                   <strong>{index + 1}</strong>: {key}
                 </li>
@@ -311,31 +313,33 @@ const CurrentRankedList = ({ udata }) => {
       )}
 
       {(creator === user || udata.username === "admin") && (
-        <div className="w-64 mx-auto border border-black border-solid rounded p-3">
+        <div className="max-w-80 mx-auto border rounded-xl shadow-md p-4">
           <form className="flex flex-col gap-4" onSubmit={handleAddition}>
-            <div className="flex items-center mb-1 ">
-              <input
+            <div className="flex items-center mb-1">
+              <Input
                 type="text"
                 placeholder="Add to list"
                 autoComplete="off"
-                name="email"
-                className="w-4/6 px-3 py-2 border-b text-sm border-gray-400  mr-2"
+                name="text"
+                className="w-4/6 px-3 py-2 border-b text-base border-gray-400  mr-2"
                 value={item}
                 onChange={(e) => setItem(e.target.value)}
               />
-              <button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-2 rounded"
-              >
-                Submit
-              </button>
-              <button
-                type="submit"
-                className="bg-red-500 hover:bg-red-700 text-white text-xs font-bold py-2 px-2 rounded"
-                onClick={handleDelete}
-              >
-                Delete
-              </button>
+              <div className="flex flex-row items-center space-x-2">
+                <Button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-700 text-sm font-bold p-2"
+                >
+                  Submit
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-red-500 hover:bg-red-700 text-sm font-bold p-2"
+                  onClick={handleDelete}
+                >
+                  Delete
+                </Button>
+              </div>
             </div>
           </form>
         </div>

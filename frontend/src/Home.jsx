@@ -160,8 +160,8 @@ const Home = () => {
                 setUserData={setUserData}
               />
               <div className="flex flex-wrap w-full ">
-                <div className="hidden md:block flex-1 md:mx-10 md:mt-60 mx-5 mt-10">
-                  <div className="w-80">
+                <div className="max-w-80 w-full hidden md:block flex-1 md:mx-10 md:mt-60 mx-5 mt-10">
+                  <div className="">
                     <RoomCreateOrJoin />
                   </div>
                   <div className="flex md:flex-none md:mt-32 mt-10 md:justify-start justify-center">
@@ -193,14 +193,12 @@ const Home = () => {
                     </div>
                   </div>
                 </div>
-                <div className="hidden md:block flex-1 m-5 mt-60 ">
-                  <div className="w-80 mx-auto">
-                    <AllUsers
-                      userList={users}
-                      roomId={roomId}
-                      //opinionList={opinionList}
-                    />
-                  </div>
+                <div className="max-w-80 w-full hidden md:block flex-1 md:mx-10 md:mt-60 mx-5 mt-10">
+                  <AllUsers
+                    userList={users}
+                    roomId={roomId}
+                    //opinionList={opinionList}
+                  />
                 </div>
               </div>
             </div>

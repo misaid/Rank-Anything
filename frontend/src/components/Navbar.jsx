@@ -2,7 +2,22 @@ import React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import rankingImage from "../assets/ranking.png";
-import logoutImage from "../assets/logout.png";
+import { LogOut, User, Compass } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = ({ userData, setAuthenticated, setUserData }) => {
   const navigate = useNavigate();
@@ -13,7 +28,7 @@ const Navbar = ({ userData, setAuthenticated, setUserData }) => {
    * This function logs out the user
    * @returns null
    * */
-  const logout = async () => {
+  const handleLogout = async () => {
     try {
       const response = await axiosInstance.post(
         "/logout",
@@ -29,20 +44,43 @@ const Navbar = ({ userData, setAuthenticated, setUserData }) => {
     }
   };
   return (
-    <div className="flex md:text-xl text-sm bg-slate-300 border-b border-solid border-black select-none md:h-20 items-center">
-      <div className="h-full p-3 md:p-6  break-words flex items-center">
-        <p>Welcome, {userData.username}</p>
-      </div>
-      <div className="h-full p-6 md:space-x-10 space-x-5 md:text-3xl text-base justify-center items-center flex flex-1 border-x border-black border-solid">
-        <h1>Rank Anything </h1>
+    <div className="flex flex-row border border-b items-center justify-between py-4 px-8">
+      <div className="h-full justify-center items-center flex md:space-x-10 space-x-5 md:text-3xl text-base">
         <img src={rankingImage} className="md:h-10 h-5" alt="Rank Anything" />
+        <h1>Rank Anything </h1>
       </div>
-      <div
-        className="p-6 flex border-r cursor-pointer items-center"
-        onClick={logout}
-      >
-        <p>Logout, </p>
-        <img className="ml-4 md:h-6 h-3" src={logoutImage} alt="Logout" />
+
+      <div className="flex flex-row space-x-2 sm:space-x-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative w-full space-x-1 p-2.5"
+          onClick={() => navigate("/")}
+        >
+          <Compass />
+          <span className="hidden sm:inline text-base">Home</span>
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost">
+              <User className="w-5 h-5" />
+              <span className="sr-only">User menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>{userData.username}</DropdownMenuLabel>
+            <DropdownMenuSeparator></DropdownMenuSeparator>
+
+            <DropdownMenuItem>
+              <div
+                className="hover:cursor-pointer w-full h-full flex flex-row justify-between items-center "
+                onClick={() => handleLogout()}
+              >
+                Logout <LogOut />
+              </div>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
