@@ -21,7 +21,7 @@ const Switch = ({ onSwitchChange }) => {
       <div
         className="ToggleItem"
         style={{
-          backgroundColor: activeOption === OPTION1 ? "grey" : "transparent",
+          backgroundColor: activeOption === OPTION1 ? "#e5e7eb" : "transparent",
         }}
         onClick={() => handleSwitchClick(OPTION1)}
       >
@@ -30,7 +30,7 @@ const Switch = ({ onSwitchChange }) => {
       <div
         className="ToggleItem"
         style={{
-          backgroundColor: activeOption === OPTION2 ? "grey" : "transparent",
+          backgroundColor: activeOption === OPTION2 ? "#e5e7eb" : "transparent",
         }}
         onClick={() => handleSwitchClick(OPTION2)}
       >
